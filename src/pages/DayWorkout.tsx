@@ -189,15 +189,20 @@ export default function DayWorkout() {
         <div className="px-6 pt-4">
           {day.note && <p className="text-[13px] font-light text-[#636158] leading-relaxed mb-6 tracking-[0.01em]">{day.note}</p>}
           {day.exercises.map((ex, i) => (
-            <div key={i} className={`flex items-start py-4 border-b-[0.5px] border-[#E5E3DD] last:border-b-0 ${ex.superset ? 'pl-4 border-l-[0.5px] border-l-[#FF5500] ml-0' : ''}`}>
+            <button
+              key={i}
+              onClick={() => setTracking(true)}
+              className={`w-full text-left flex items-start py-4 border-b-[0.5px] border-[#E5E3DD] last:border-b-0 active:bg-[#F0EFEC] transition-colors ${ex.superset ? 'pl-4 border-l-[0.5px] border-l-[#FF5500]' : ''}`}
+            >
               <span className="text-[11px] font-light text-[#B5B2AA] w-6 flex-shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
               <div className="flex-1 min-w-0 px-4">
                 <p className="text-[15px] font-light text-[#0F0F0E] tracking-[0.01em] lowercase leading-snug">{ex.name.toLowerCase()}</p>
-                <p className="text-[11px] font-light text-[#B5B2AA] mt-0.5 tracking-[0.03em]">
+                <p className="text-[11px] font-light text-[#636158] mt-0.5 tracking-[0.03em]">
                   {ex.sets} sets · {ex.reps} reps{ex.homeAlt ? ` · alt: ${ex.homeAlt.toLowerCase()}` : ''}
                 </p>
               </div>
-            </div>
+              <ArrowLeft size={12} className="text-[#B5B2AA] flex-shrink-0 mt-1 rotate-180" />
+            </button>
           ))}
         </div>
 
@@ -261,7 +266,7 @@ export default function DayWorkout() {
               <div className="w-[44%] flex-shrink-0 min-h-[118px] bg-[#1C1C1A] overflow-hidden flex items-center justify-center">
                 {imgUrl
                   ? <img src={imgUrl} alt={ex.name} loading="lazy" className="w-full h-full object-cover grayscale" />
-                  : <span className="text-[28px] font-extralight text-[#2A2A28]">{ex.name.charAt(0).toLowerCase()}</span>
+                  : <span className="text-[28px] font-extralight text-[#636158]">{ex.name.charAt(0).toLowerCase()}</span>
                 }
               </div>
 
@@ -325,10 +330,10 @@ export default function DayWorkout() {
 
       {restActive && <RestTimer key={restKey} onDismiss={() => setRestActive(false)} />}
 
-      <div className="fixed left-0 right-0 px-6 pt-8"
+      <div className="fixed left-0 right-0 px-6 pt-8 pointer-events-none"
         style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))', background: 'linear-gradient(to top, #111110 70%, transparent)' }}>
         <button onClick={finishAndNext} disabled={!allDone || saving}
-          className={`w-full py-[18px] t-cta transition-opacity ${allDone ? 'bg-[#FF5500] text-white active:opacity-75' : 'bg-[#1C1C1A] text-[#4A4844] cursor-default'}`}>
+          className={`pointer-events-auto w-full py-[18px] t-cta transition-opacity ${allDone ? 'bg-[#FF5500] text-white active:opacity-75' : 'bg-[#1C1C1A] text-[#4A4844] cursor-default'}`}>
           {saving ? 'saving…' : allDone ? (nextDay ? 'Finish & Next Day' : 'Finish Workout') : `${completedSets} / ${totalSets} sets`}
         </button>
       </div>
