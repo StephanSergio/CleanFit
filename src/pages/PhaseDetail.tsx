@@ -39,12 +39,12 @@ export default function PhaseDetail() {
         <div
           className={`w-8 h-8 flex items-center justify-center flex-shrink-0 ${
             done
-              ? 'bg-[#FF5500] border-[0.5px] border-[#FF5500]'
+              ? 'bg-[#22E8E0] border-[0.5px] border-[#22E8E0]'
               : 'border-[0.5px] border-[#0F0F0E]'
           }`}
         >
           {done
-            ? <Check size={13} className="text-white" strokeWidth={2} />
+            ? <Check size={13} className="text-[#0F0F0E]" strokeWidth={2} />
             : <span className="text-[12px] font-light text-[#0F0F0E]">{day.day}</span>
           }
         </div>

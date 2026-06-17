@@ -56,7 +56,7 @@ export default function ExerciseCard({ exercise, onSelect, onSwap, onRemove, mod
           {onRemove && (
             <button
               onClick={(e) => { e.stopPropagation(); onRemove() }}
-              className="p-2 bg-transparent border-[0.5px] border-[#FF5500]/30 text-[#FF5500]"
+              className="p-2 bg-transparent border-[0.5px] border-[#22E8E0]/30 text-[#22E8E0]"
               aria-label="Remove exercise"
             >
               <X size={16} />

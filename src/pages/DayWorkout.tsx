@@ -185,7 +185,7 @@ export default function DayWorkout() {
           </button>
           <p className="t-eyebrow mb-3">
             {program.phases.length > 1 ? `Phase ${phaseIndex} · ` : ''}Week {week} · Day {day.day}
-            {day.type && <span className="ml-2 border-[0.5px] border-[#FF5500] text-[#FF5500] px-2 py-0.5 rounded-[6px]">{day.type}</span>}
+            {day.type && <span className="ml-2 border-[0.5px] border-[#22E8E0] text-[#22E8E0] px-2 py-0.5 rounded-[6px]">{day.type}</span>}
           </p>
           <h1 className="t-hero text-[#0F0F0E]">{day.focus.toLowerCase()}</h1>
           <p className="text-[13px] font-light text-[#B5B2AA] mt-3">{day.exercises.length} exercises</p>
@@ -197,7 +197,7 @@ export default function DayWorkout() {
             <button
               key={i}
               onClick={() => setTracking(true)}
-              className={`w-full text-left flex items-start py-4 border-b-[0.5px] border-[#E5E3DD] last:border-b-0 active:bg-[#F0EFEC] transition-colors ${ex.superset ? 'pl-4 border-l-[0.5px] border-l-[#FF5500]' : ''}`}
+              className={`w-full text-left flex items-start py-4 border-b-[0.5px] border-[#E5E3DD] last:border-b-0 active:bg-[#F0EFEC] transition-colors ${ex.superset ? 'pl-4 border-l-[0.5px] border-l-[#22E8E0]' : ''}`}
             >
               <span className="text-[11px] font-light text-[#B5B2AA] w-6 flex-shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
               <div className="flex-1 min-w-0 px-4">
@@ -214,7 +214,7 @@ export default function DayWorkout() {
         <div className="fixed bottom-0 left-0 right-0 px-6 pt-8 pb-6 bg-[#F8F7F4]"
           style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
           <button onClick={() => setTracking(true)}
-            className="w-full bg-[#FF5500] text-white py-[18px] t-cta active:opacity-75 transition-opacity">
+            className="w-full bg-[#22E8E0] text-[#0F0F0E] py-[18px] t-cta active:opacity-75 transition-opacity">
             Start Workout
           </button>
         </div>
@@ -229,7 +229,7 @@ export default function DayWorkout() {
         <button onClick={() => setRestActive(true)}
           className="fixed right-6 z-20 flex items-center gap-1.5 bg-white border-[0.5px] border-[#E5E3DD] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-[#0F0F0E]"
           style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
-          <Timer size={13} className="text-[#FF5500]" /> Rest
+          <Timer size={13} className="text-[#22E8E0]" /> Rest
         </button>
       )}
 
@@ -254,7 +254,7 @@ export default function DayWorkout() {
           </div>
           <button onClick={() => setRestActive(true)}
             className="flex items-center gap-1.5 bg-white border-[0.5px] border-[#E5E3DD] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-[#0F0F0E] flex-shrink-0">
-            <Timer size={13} className="text-[#FF5500]" /> Rest
+            <Timer size={13} className="text-[#22E8E0]" /> Rest
           </button>
         </div>
       </div>
@@ -278,17 +278,17 @@ export default function DayWorkout() {
               {/* Right half — title + sets */}
               <div className="flex-1 min-w-0 p-3 flex flex-col">
                 {ex.superset && (
-                  <p className="text-[9px] font-medium text-[#FF5500] uppercase tracking-[0.2em] mb-0.5">Superset</p>
+                  <p className="text-[9px] font-medium text-[#22E8E0] uppercase tracking-[0.2em] mb-0.5">Superset</p>
                 )}
                 <div className="flex items-start gap-1 mb-0.5">
                   <p className={`text-[13px] font-light lowercase tracking-[0.01em] leading-tight flex-1 ${exDone ? 'text-[#636158]' : 'text-[#0F0F0E]'}`}>
                     {ex.name.toLowerCase()}
                   </p>
-                  {exDone && <CheckCircle2 size={14} className="text-[#FF5500] flex-shrink-0 mt-0.5" />}
+                  {exDone && <CheckCircle2 size={14} className="text-[#22E8E0] flex-shrink-0 mt-0.5" />}
                 </div>
                 <div className="flex items-center gap-2 mb-2">
                   <p className="text-[10px] font-light text-[#636158] tracking-[0.03em] truncate">{ex.prescription}</p>
-                  <span className={`text-[10px] font-medium flex-shrink-0 ${exDone ? 'text-[#FF5500]' : 'text-[#636158]'}`}>
+                  <span className={`text-[10px] font-medium flex-shrink-0 ${exDone ? 'text-[#22E8E0]' : 'text-[#636158]'}`}>
                     {exDoneCount}/{ex.sets.length}
                   </span>
                 </div>
@@ -296,14 +296,14 @@ export default function DayWorkout() {
                 <div className="flex flex-col gap-1">
                   {ex.sets.map((set, setIdx) => (
                     <div key={setIdx}
-                      className={`flex items-center gap-1.5 px-2 py-1.5 border-[0.5px] ${set.completed ? 'border-[#FF5500]/30 bg-[#FF5500]/8' : 'border-[#E5E3DD] bg-[#F8F7F4]'}`}>
+                      className={`flex items-center gap-1.5 px-2 py-1.5 border-[0.5px] ${set.completed ? 'border-[#22E8E0]/30 bg-[#22E8E0]/8' : 'border-[#E5E3DD] bg-[#F8F7F4]'}`}>
                       <span className="text-[10px] font-light text-[#636158] w-3 flex-shrink-0">{setIdx + 1}</span>
                       <div className="flex flex-1 min-w-0 items-center gap-1.5">
                         <div className="flex-1 min-w-0 flex flex-col items-center overflow-hidden">
                           <input
                             type="number" inputMode="numeric" value={set.reps} min={1}
                             onChange={(e) => updateSet(exIdx, setIdx, { reps: Math.max(1, parseInt(e.target.value) || 1) })}
-                            className="w-full min-w-0 text-center text-[14px] font-extralight bg-transparent text-[#0F0F0E] focus:outline-none border-b-[0.5px] border-[#E5E3DD] focus:border-[#FF5500] pb-0.5"
+                            className="w-full min-w-0 text-center text-[16px] font-extralight bg-transparent text-[#0F0F0E] focus:outline-none border-b-[0.5px] border-[#E5E3DD] focus:border-[#22E8E0] pb-0.5"
                           />
                           <span className="text-[8px] font-medium text-[#636158] uppercase tracking-[0.12em] mt-0.5">reps</span>
                         </div>
@@ -311,13 +311,13 @@ export default function DayWorkout() {
                           <input
                             type="number" inputMode="decimal" value={set.weightKg} min={0} step={2.5}
                             onChange={(e) => updateSet(exIdx, setIdx, { weightKg: Math.max(0, parseFloat(e.target.value) || 0) })}
-                            className="w-full min-w-0 text-center text-[14px] font-extralight bg-transparent text-[#0F0F0E] focus:outline-none border-b-[0.5px] border-[#E5E3DD] focus:border-[#FF5500] pb-0.5"
+                            className="w-full min-w-0 text-center text-[16px] font-extralight bg-transparent text-[#0F0F0E] focus:outline-none border-b-[0.5px] border-[#E5E3DD] focus:border-[#22E8E0] pb-0.5"
                           />
                           <span className="text-[8px] font-medium text-[#636158] uppercase tracking-[0.12em] mt-0.5">kg</span>
                         </div>
                       </div>
                       <button onClick={() => toggleSet(exIdx, setIdx)}
-                        className={`w-6 h-6 flex items-center justify-center flex-shrink-0 border-[0.5px] ${set.completed ? 'border-[#FF5500] bg-[#FF5500] text-white' : 'border-[#E5E3DD] text-[#636158]'}`}>
+                        className={`w-6 h-6 flex items-center justify-center flex-shrink-0 border-[0.5px] ${set.completed ? 'border-[#22E8E0] bg-[#22E8E0] text-[#0F0F0E]' : 'border-[#E5E3DD] text-[#636158]'}`}>
                         <CheckCircle2 size={12} strokeWidth={2} />
                       </button>
                     </div>
@@ -338,7 +338,7 @@ export default function DayWorkout() {
       <div className="fixed left-0 right-0 px-6 pt-8 pointer-events-none"
         style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))', background: 'linear-gradient(to top, #F8F7F4 75%, transparent)' }}>
         <button onClick={finishAndNext} disabled={!allDone || saving}
-          className={`pointer-events-auto w-full py-[18px] t-cta transition-opacity ${allDone ? 'bg-[#FF5500] text-white active:opacity-75' : 'bg-white text-[#636158] cursor-default'}`}>
+          className={`pointer-events-auto w-full py-[18px] t-cta transition-opacity ${allDone ? 'bg-[#22E8E0] text-[#0F0F0E] active:opacity-75' : 'bg-white text-[#636158] cursor-default'}`}>
           {saving ? 'saving…' : allDone ? (nextDay ? 'Finish & Next Day' : 'Finish Workout') : `${completedSets} / ${totalSets} sets`}
         </button>
       </div>

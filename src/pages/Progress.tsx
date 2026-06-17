@@ -56,7 +56,7 @@ export default function Progress() {
         <div className="relative flex items-center justify-center">
           <CircleRing
             percent={Math.min(100, (workouts.length / 50) * 100)}
-            color="#FF5500"
+            color="#22E8E0"
             trackColor="#E5E3DD"
             size={160}
             stroke={12}
@@ -137,9 +137,9 @@ export default function Progress() {
                       <Line
                         type="monotone"
                         dataKey="weight"
-                        stroke="#FF5500"
+                        stroke="#22E8E0"
                         strokeWidth={2}
-                        dot={{ fill: '#FF5500', r: 3 }}
+                        dot={{ fill: '#22E8E0', r: 3 }}
                         activeDot={{ r: 5 }}
                       />
                     </LineChart>

@@ -9,6 +9,7 @@ import Exercises from './pages/Exercises'
 import History from './pages/History'
 import Progress from './pages/Progress'
 import Programs from './pages/Programs'
+import Profile from './pages/Profile'
 import Program from './pages/Program'
 import PhaseDetail from './pages/PhaseDetail'
 import DayWorkout from './pages/DayWorkout'
@@ -19,7 +20,7 @@ function ProtectedLayout() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#FF5500] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#22E8E0] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -35,6 +36,7 @@ function ProtectedLayout() {
         <Route path="/history" element={<History />} />
         <Route path="/progress" element={<Progress />} />
         <Route path="/programs" element={<Programs />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/program/:programId" element={<Program />} />
         <Route path="/program/:programId/:phaseId" element={<PhaseDetail />} />
         <Route path="/program/:programId/:phaseId/w/:week/d/:dayNum" element={<DayWorkout />} />

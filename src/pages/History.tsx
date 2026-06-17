@@ -65,7 +65,7 @@ export default function History() {
                   key={cell.dateStr}
                   className={`aspect-square flex items-center justify-center rounded-none text-[13px] font-light relative ${
                     isToday
-                      ? 'bg-[#FF5500] text-white'
+                      ? 'bg-[#22E8E0] text-[#0F0F0E]'
                       : cell.hasWorkout
                       ? 'bg-[#0F0F0E] text-white'
                       : 'text-[#0F0F0E]'
@@ -108,7 +108,7 @@ export default function History() {
                   {/* Completion symbol */}
                   <div className="w-5 flex-shrink-0 pt-0.5 text-center">
                     {allDone
-                      ? <span className="text-[12px] text-[#FF5500]">✓</span>
+                      ? <span className="text-[12px] text-[#22E8E0]">✓</span>
                       : partialDone
                       ? <span className="text-[12px] text-[#B5B2AA]">·</span>
                       : <span className="text-[12px] text-[#E5E3DD]">○</span>}

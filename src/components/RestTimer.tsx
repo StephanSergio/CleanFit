@@ -53,7 +53,7 @@ export default function RestTimer({ onDismiss }: Props) {
       <div className="bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] overflow-hidden">
         <div className="h-[1px] bg-[#2A2A28]">
           <div
-            className="h-[1px] bg-[#FF5500] transition-all duration-1000 linear"
+            className="h-[1px] bg-[#22E8E0] transition-all duration-1000 linear"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -73,7 +73,7 @@ export default function RestTimer({ onDismiss }: Props) {
                 onClick={() => select(p.seconds)}
                 className={`text-[10px] font-medium uppercase tracking-[0.14em] px-3 py-1.5 rounded-none transition-colors ${
                   preset === p.seconds
-                    ? 'bg-[#FF5500] text-white'
+                    ? 'bg-[#22E8E0] text-[#0F0F0E]'
                     : 'bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] text-[#636158]'
                 }`}
               >

@@ -59,8 +59,8 @@ export default function BottomNav() {
           </NavLink>
         ))}
 
-        {/* Profile / Home */}
-        <NavLink to="/" end className="flex-1 flex flex-col items-center justify-center gap-1" aria-label="Profile">
+        {/* Profile */}
+        <NavLink to="/profile" className="flex-1 flex flex-col items-center justify-center gap-1" aria-label="Profile">
           {({ isActive }) => (
             <>
               <div
@@ -69,7 +69,7 @@ export default function BottomNav() {
                   width: 32,
                   height: 32,
                   background: '#0F0F0E',
-                  border: isActive ? '0.5px solid #FF5500' : '0.5px solid transparent',
+                  border: isActive ? '0.5px solid #22E8E0' : '0.5px solid transparent',
                 }}
               >
                 {initial}

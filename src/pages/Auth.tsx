@@ -76,12 +76,12 @@ export default function Auth() {
             className="w-full bg-transparent border-b-[0.5px] border-[#E5E3DD] rounded-none px-0 py-3 text-[15px] font-light text-[#0F0F0E] placeholder-[#B5B2AA] focus:outline-none focus:border-[#0F0F0E] transition-colors"
           />
           {error && (
-            <p className="text-[12px] font-light text-[#FF5500]">{error}</p>
+            <p className="text-[12px] font-light text-[#22E8E0]">{error}</p>
           )}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#FF5500] text-white rounded-none py-[18px] text-[11px] font-medium uppercase tracking-[0.2em] mt-1 disabled:opacity-50 transition-opacity"
+            className="w-full bg-[#22E8E0] text-[#0F0F0E] rounded-none py-[18px] text-[11px] font-medium uppercase tracking-[0.2em] mt-1 disabled:opacity-50 transition-opacity"
           >
             {loading ? 'Loading…' : mode === 'signin' ? 'Sign In' : 'Create Account'}
           </button>

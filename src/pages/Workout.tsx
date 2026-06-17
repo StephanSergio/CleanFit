@@ -50,7 +50,7 @@ export default function Workout() {
         <p className="text-[#636158] text-[15px] font-light lowercase">no active workout.</p>
         <button
           onClick={() => dispatch({ type: 'START' })}
-          className="bg-[#FF5500] text-white px-8 py-[18px] w-full text-[11px] font-medium uppercase tracking-[0.2em] rounded-none"
+          className="bg-[#22E8E0] text-[#0F0F0E] px-8 py-[18px] w-full text-[11px] font-medium uppercase tracking-[0.2em] rounded-none"
         >
           Start Workout
         </button>
@@ -116,13 +116,13 @@ export default function Workout() {
               onClick={() => setRestActive(true)}
               className="flex items-center gap-1.5 border-[0.5px] border-[#E5E3DD] bg-white px-4 py-2 rounded-none text-[11px] font-medium uppercase tracking-[0.2em] text-[#0F0F0E]"
             >
-              <Timer size={12} className="text-[#FF5500]" />
+              <Timer size={12} className="text-[#22E8E0]" />
               Rest
             </button>
             <button
               onClick={finish}
               disabled={finishing}
-              className="bg-[#FF5500] text-white px-4 py-2 rounded-none text-[11px] font-medium uppercase tracking-[0.2em] disabled:opacity-60"
+              className="bg-[#22E8E0] text-[#0F0F0E] px-4 py-2 rounded-none text-[11px] font-medium uppercase tracking-[0.2em] disabled:opacity-60"
             >
               Finish
             </button>
@@ -188,7 +188,7 @@ export default function Workout() {
       >
         <button
           onClick={() => { setSwapFor(null); setDrawerOpen(true) }}
-          className="w-14 h-14 bg-[#FF5500] rounded-none flex items-center justify-center text-white active:opacity-80 transition-opacity"
+          className="w-14 h-14 bg-[#22E8E0] rounded-none flex items-center justify-center text-[#0F0F0E] active:opacity-80 transition-opacity"
         >
           <Plus size={26} strokeWidth={2.5} />
         </button>

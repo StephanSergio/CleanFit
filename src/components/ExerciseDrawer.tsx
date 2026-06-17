@@ -100,7 +100,7 @@ export default function ExerciseDrawer({ open, onClose, onSelect, filterCategory
         <div className="flex-1 overflow-y-auto px-5 pb-6 flex flex-col">
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <Loader2 size={24} className="animate-spin text-[#FF5500]" />
+              <Loader2 size={24} className="animate-spin text-[#22E8E0]" />
             </div>
           ) : filtered.length === 0 ? (
             <p className="text-center text-[#B5B2AA] text-[15px] font-light py-12">No exercises found</p>

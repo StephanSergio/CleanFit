@@ -74,7 +74,7 @@ export default function Dashboard() {
         <div className="mt-5">
           <div className="h-[1px] bg-[#E5E3DD] relative overflow-hidden">
             <div
-              className="absolute top-0 left-0 h-[1px] bg-[#FF5500]"
+              className="absolute top-0 left-0 h-[1px] bg-[#22E8E0]"
               style={{ width: `${pct ?? 0}%`, transition: 'width 0.8s cubic-bezier(0.25,0.46,0.45,0.94)' }}
             />
           </div>
@@ -107,11 +107,11 @@ export default function Dashboard() {
                 {row.dayLabel}
               </span>
               <span className={`flex-1 text-[15px] font-light lowercase tracking-[0.01em] ${
-                isToday && !isDone ? 'text-[#FF5500]' : row.isRest ? 'text-[#B5B2AA]' : 'text-[#0F0F0E]'
+                isToday && !isDone ? 'text-[#22E8E0]' : row.isRest ? 'text-[#B5B2AA]' : 'text-[#0F0F0E]'
               }`}>
                 {row.focus.toLowerCase()}
               </span>
-              <span className={`text-[13px] flex-shrink-0 w-4 text-right ${isDone ? 'text-[#636158]' : isToday ? 'text-[#FF5500]' : 'text-[#B5B2AA]'}`}>
+              <span className={`text-[13px] flex-shrink-0 w-4 text-right ${isDone ? 'text-[#636158]' : isToday ? 'text-[#22E8E0]' : 'text-[#B5B2AA]'}`}>
                 {isDone ? '✓' : isToday && !row.isRest ? '·' : row.isRest ? '–' : '○'}
               </span>
             </button>
@@ -123,7 +123,7 @@ export default function Dashboard() {
       <div className="px-6 pt-6 pb-3">
         <button
           onClick={startToday}
-          className="w-full bg-[#FF5500] text-white py-[18px] t-cta active:opacity-75 transition-opacity"
+          className="w-full bg-[#22E8E0] text-[#0F0F0E] py-[18px] t-cta active:opacity-75 transition-opacity"
         >
           Start Today's Workout
         </button>
