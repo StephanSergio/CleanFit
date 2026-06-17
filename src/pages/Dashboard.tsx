@@ -1,8 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import { Plus, Flame, Dumbbell, ChevronRight } from 'lucide-react'
+import { Dumbbell, Play, RotateCcw, Zap } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { useWorkout } from '../contexts/WorkoutContext'
+import { useProgramProgress, useCompletedDays } from '../hooks/useProgramProgress'
+import { BUFF_DUDES } from '../data/buffDudes'
+import CircleRing from '../components/CircleRing'
 
 function greeting() {
   const h = new Date().getHours()
@@ -19,6 +22,8 @@ export default function Dashboard() {
   const { user } = useAuth()
   const { workouts, loading } = useWorkouts()
   const { dispatch } = useWorkout()
+  const { progress } = useProgramProgress()
+  const { isCompletedThisWeek } = useCompletedDays()
   const navigate = useNavigate()
 
   const name = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'there'
@@ -28,73 +33,138 @@ export default function Dashboard() {
     return diff <= 7
   }).length
 
-  function startWorkout() {
+  const completedProgramDays = BUFF_DUDES.phases.reduce(
+    (n, p) => n + p.days.filter((d) => isCompletedThisWeek(p.id, d.day)).length, 0
+  )
+  const weeklyGoal = 4
+  const ringPct = Math.min(100, (thisWeek / weeklyGoal) * 100)
+
+  function startFreeSession() {
     dispatch({ type: 'START' })
     navigate('/workout')
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7] pb-nav">
+    <div className="min-h-screen bg-[#F2F2F7] pb-nav">
       <div className="px-5 pt-14 pb-6">
-        <p className="text-[#6E6E73] text-[15px]">{greeting()},</p>
-        <h1 className="text-[28px] font-bold text-[#1D1D1F] tracking-tight capitalize">{name} 👋</h1>
+        <p className="text-[13px] text-[#8E8E93] mb-1">{greeting()}</p>
+        <h1 className="text-[38px] font-bold text-[#1C1C1E] tracking-tight leading-none capitalize">
+          {name}
+        </h1>
       </div>
 
-      <div className="px-5 mb-5">
-        <button
-          onClick={startWorkout}
-          className="w-full bg-[#0071E3] text-white rounded-2xl py-4 flex items-center justify-center gap-2 text-[17px] font-semibold shadow-md active:bg-[#005BB5] transition-colors"
-        >
-          <Plus size={22} strokeWidth={2.5} />
-          Start Workout
-        </button>
-      </div>
-
-      <div className="px-5 mb-6 grid grid-cols-2 gap-3">
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <div className="w-9 h-9 bg-orange-50 rounded-xl flex items-center justify-center mb-2">
-            <Flame size={20} className="text-orange-500" />
+      {/* Weekly ring + stats */}
+      <div className="px-5 mb-6 flex items-center gap-4">
+        <div className="relative flex items-center justify-center flex-shrink-0">
+          <CircleRing
+            percent={ringPct}
+            color="#F4845F"
+            trackColor="#E5E5EA"
+            size={110}
+            stroke={9}
+          />
+          <div className="absolute text-center">
+            <p className="text-[28px] font-bold text-[#1C1C1E] leading-none">{thisWeek}</p>
+            <p className="text-[11px] text-[#8E8E93]">/ {weeklyGoal}</p>
           </div>
-          <p className="text-[26px] font-bold text-[#1D1D1F]">{thisWeek}</p>
-          <p className="text-[13px] text-[#6E6E73]">This week</p>
         </div>
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center mb-2">
-            <Dumbbell size={20} className="text-[#0071E3]" />
+        <div className="flex-1 flex flex-col gap-2.5">
+          <div className="bg-white shadow-sm rounded-[16px] px-4 py-3">
+            <p className="text-[24px] font-bold text-[#1C1C1E] leading-none">{workouts.length}</p>
+            <p className="text-[12px] text-[#8E8E93] mt-0.5">Total sessions</p>
           </div>
-          <p className="text-[26px] font-bold text-[#1D1D1F]">{workouts.length}</p>
-          <p className="text-[13px] text-[#6E6E73]">Total sessions</p>
+          <div className="bg-white shadow-sm rounded-[16px] px-4 py-3">
+            <p className="text-[24px] font-bold text-[#1C1C1E] leading-none">{completedProgramDays}</p>
+            <p className="text-[12px] text-[#8E8E93] mt-0.5">Program days done</p>
+          </div>
         </div>
       </div>
 
-      <div className="px-5">
-        <h2 className="text-[17px] font-bold text-[#1D1D1F] mb-3">Recent Workouts</h2>
-        {loading ? (
-          <div className="flex flex-col gap-2">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-2xl h-16 animate-pulse" />
-            ))}
-          </div>
-        ) : workouts.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
-            <p className="text-[#6E6E73] text-[15px]">No workouts yet. Hit Start to begin!</p>
+      {/* CTA */}
+      <div className="px-5 mb-6">
+        {progress ? (
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => navigate(`/program/${progress.phaseId}/day/${progress.dayNum}`)}
+              className="w-full bg-[#F4845F] text-white rounded-[16px] px-5 py-4 flex items-center gap-3 active:opacity-80 transition-opacity text-left"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+            >
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <Play size={18} fill="white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/80 mb-0.5">Continue Program</p>
+                <p className="text-[16px] font-semibold truncate">{progress.focus}</p>
+              </div>
+            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={startFreeSession}
+                className="flex-1 bg-white shadow-sm rounded-[16px] px-4 py-3.5 text-[14px] font-semibold text-[#1C1C1E] flex items-center justify-center gap-2 active:opacity-80 transition-opacity"
+              >
+                <Dumbbell size={16} className="text-[#F4845F]" />
+                Free Session
+              </button>
+              <button
+                onClick={() => navigate('/program')}
+                className="flex-1 bg-white shadow-sm rounded-[16px] px-4 py-3.5 text-[14px] font-semibold text-[#1C1C1E] flex items-center justify-center gap-2 active:opacity-80 transition-opacity"
+              >
+                <RotateCcw size={16} className="text-[#F4845F]" />
+                Full Program
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
-            {workouts.slice(0, 5).map((w) => (
-              <div key={w.id} className="bg-white rounded-2xl px-4 py-3 shadow-sm flex items-center">
-                <div className="flex-1">
-                  <p className="font-semibold text-[15px] text-[#1D1D1F]">{w.name}</p>
-                  <p className="text-[13px] text-[#6E6E73]">
-                    {formatDate(w.date)} · {w.exercises.length} exercise{w.exercises.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-                <ChevronRight size={16} className="text-[#D2D2D7]" />
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => navigate('/program/phase_1/day/1')}
+              className="w-full bg-[#F4845F] text-white rounded-[16px] px-5 py-4 flex items-center gap-3 active:opacity-80 transition-opacity text-left"
+            >
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <Zap size={18} className="text-white" />
               </div>
-            ))}
+              <div className="flex-1">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/80 mb-0.5">Buff Dudes 12 Week</p>
+                <p className="text-[16px] font-semibold">Begin Program</p>
+              </div>
+              <Play size={18} fill="white" className="flex-shrink-0" />
+            </button>
+            <button
+              onClick={startFreeSession}
+              className="w-full bg-white shadow-sm rounded-[16px] px-5 py-3.5 text-[15px] font-semibold text-[#1C1C1E] flex items-center justify-center gap-2 active:opacity-80 transition-opacity"
+            >
+              <Dumbbell size={16} className="text-[#F4845F]" />
+              Free Session
+            </button>
           </div>
         )}
       </div>
+
+      {/* Recent workouts */}
+      {!loading && workouts.length > 0 && (
+        <div className="px-5">
+          <p className="text-[13px] font-semibold text-[#8E8E93] uppercase tracking-wider mb-3">Recent</p>
+          <div className="bg-white shadow-sm rounded-[20px] overflow-hidden">
+            {workouts.slice(0, 5).map((w, i) => (
+              <div
+                key={w.id}
+                className={`px-4 py-3.5 flex items-center gap-3 ${i < Math.min(workouts.length, 5) - 1 ? 'border-b border-[#E5E5EA]' : ''}`}
+              >
+                <div className="w-9 h-9 bg-[#ECECF1] rounded-full flex items-center justify-center flex-shrink-0">
+                  <Dumbbell size={15} className="text-[#F4845F]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-[14px] text-[#1C1C1E] truncate">{w.name}</p>
+                  <p className="text-[12px] text-[#8E8E93] mt-0.5">{formatDate(w.date)}</p>
+                </div>
+                {w.durationMinutes && (
+                  <span className="text-[12px] text-[#8E8E93] flex-shrink-0">{w.durationMinutes}m</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

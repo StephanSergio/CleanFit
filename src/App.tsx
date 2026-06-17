@@ -8,14 +8,17 @@ import Workout from './pages/Workout'
 import Exercises from './pages/Exercises'
 import History from './pages/History'
 import Progress from './pages/Progress'
+import Program from './pages/Program'
+import PhaseDetail from './pages/PhaseDetail'
+import DayWorkout from './pages/DayWorkout'
 
 function ProtectedLayout() {
   const { user, loading } = useAuth()
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#0071E3] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#F2F2F7] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#F4845F] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -30,6 +33,9 @@ function ProtectedLayout() {
         <Route path="/exercises" element={<Exercises />} />
         <Route path="/history" element={<History />} />
         <Route path="/progress" element={<Progress />} />
+        <Route path="/program" element={<Program />} />
+        <Route path="/program/:phaseId" element={<PhaseDetail />} />
+        <Route path="/program/:phaseId/day/:dayNum" element={<DayWorkout />} />
       </Routes>
       <BottomNav />
     </WorkoutProvider>

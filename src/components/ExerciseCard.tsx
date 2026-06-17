@@ -9,7 +9,7 @@ const categoryColors: Record<string, string> = {
   Shoulders: 'bg-pink-50 text-pink-600',
   Abs: 'bg-yellow-50 text-yellow-700',
   Calves: 'bg-teal-50 text-teal-600',
-  Other: 'bg-gray-100 text-gray-500',
+  Other: 'bg-[#ECECF1] text-[#8E8E93]',
 }
 
 interface Props {
@@ -25,12 +25,12 @@ export default function ExerciseCard({ exercise, onSelect, onSwap, onRemove, mod
 
   return (
     <div
-      className={`flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm ${
-        mode === 'library' ? 'active:bg-[#F5F5F7] cursor-pointer' : ''
+      className={`flex items-center gap-3 ${
+        mode === 'library' ? 'active:opacity-70 cursor-pointer' : ''
       }`}
       onClick={mode === 'library' ? () => onSelect?.(exercise) : undefined}
     >
-      <div className="w-12 h-12 rounded-xl bg-[#F5F5F7] overflow-hidden flex-shrink-0 flex items-center justify-center">
+      <div className="w-11 h-11 rounded-[12px] bg-[#ECECF1] overflow-hidden flex-shrink-0 flex items-center justify-center">
         {exercise.imageUrl ? (
           <img
             src={exercise.imageUrl}
@@ -40,17 +40,17 @@ export default function ExerciseCard({ exercise, onSelect, onSwap, onRemove, mod
             onError={(e) => {
               const el = e.target as HTMLImageElement
               el.style.display = 'none'
-              el.parentElement!.innerHTML = `<span class="text-lg font-bold text-[#6E6E73]">${exercise.name.charAt(0)}</span>`
+              el.parentElement!.innerHTML = `<span class="text-base font-bold text-[#8E8E93]">${exercise.name.charAt(0)}</span>`
             }}
           />
         ) : (
-          <span className="text-lg font-bold text-[#6E6E73]">{exercise.name.charAt(0)}</span>
+          <span className="text-base font-bold text-[#8E8E93]">{exercise.name.charAt(0)}</span>
         )}
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-[15px] text-[#1D1D1F] truncate">{exercise.name}</p>
-        <span className={`inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-0.5 ${colorClass}`}>
+        <p className="font-semibold text-[15px] text-[#1C1C1E] truncate">{exercise.name}</p>
+        <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 uppercase tracking-wide ${colorClass}`}>
           {exercise.category}
         </span>
       </div>
@@ -60,7 +60,7 @@ export default function ExerciseCard({ exercise, onSelect, onSwap, onRemove, mod
           {onSwap && (
             <button
               onClick={(e) => { e.stopPropagation(); onSwap() }}
-              className="p-2 rounded-xl bg-[#F5F5F7] text-[#0071E3] active:bg-[#E8E8ED]"
+              className="p-2 rounded-[12px] bg-[#ECECF1] text-[#8E8E93]"
               aria-label="Swap exercise"
             >
               <Repeat2 size={16} />
@@ -69,7 +69,7 @@ export default function ExerciseCard({ exercise, onSelect, onSwap, onRemove, mod
           {onRemove && (
             <button
               onClick={(e) => { e.stopPropagation(); onRemove() }}
-              className="p-2 rounded-xl bg-[#F5F5F7] text-[#FF3B30] active:bg-[#E8E8ED]"
+              className="p-2 rounded-[12px] bg-[#ECECF1] text-[#FF453A]"
               aria-label="Remove exercise"
             >
               <X size={16} />

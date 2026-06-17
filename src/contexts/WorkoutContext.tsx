@@ -10,6 +10,7 @@ export interface ActiveWorkout {
 
 type Action =
   | { type: 'START' }
+  | { type: 'START_WITH_EXERCISES'; name: string; exercises: WorkoutExercise[] }
   | { type: 'ADD_EXERCISE'; exercise: Omit<WorkoutExercise, 'sets'> }
   | { type: 'REMOVE_EXERCISE'; index: number }
   | { type: 'SWAP_EXERCISE'; index: number; exercise: Omit<WorkoutExercise, 'sets'> }
@@ -19,7 +20,7 @@ type Action =
   | { type: 'REMOVE_SET'; exerciseIndex: number; setIndex: number }
   | { type: 'RESET' }
 
-const defaultSet: WorkoutSet = { reps: 10, weightKg: 20, completed: false }
+const defaultSet: WorkoutSet = { reps: 4, weightKg: 10, completed: false }
 
 function makeExercise(base: Omit<WorkoutExercise, 'sets'>): WorkoutExercise {
   return { ...base, sets: [{ ...defaultSet }] }
@@ -30,6 +31,14 @@ function reducer(state: ActiveWorkout | null, action: Action): ActiveWorkout | n
 
   if (action.type === 'START') {
     return { name: 'Workout', startTime: Date.now(), exercises: [] }
+  }
+
+  if (action.type === 'START_WITH_EXERCISES') {
+    return {
+      name: action.name,
+      startTime: Date.now(),
+      exercises: action.exercises,
+    }
   }
 
   if (!state) return state

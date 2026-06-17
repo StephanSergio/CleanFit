@@ -51,42 +51,45 @@ export default function ExerciseDrawer({ open, onClose, onSelect, filterCategory
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-t-3xl flex flex-col max-h-[85vh]">
-        <div className="flex items-center justify-between px-5 pt-5 pb-3">
-          <h2 className="text-[18px] font-bold text-[#1D1D1F]">{title}</h2>
-          <button onClick={onClose} className="p-2 rounded-full bg-[#F5F5F7] text-[#6E6E73]">
-            <X size={18} />
+      <div className="relative bg-white rounded-t-[28px] flex flex-col max-h-[88vh]">
+        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-[#E5E5EA]">
+          <h2 className="text-[17px] font-bold text-[#1C1C1E] tracking-tight">{title}</h2>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-[#ECECF1] flex items-center justify-center text-[#8E8E93]"
+          >
+            <X size={16} />
           </button>
         </div>
 
-        <div className="px-4 pb-3">
-          <div className="flex items-center gap-2 bg-[#F5F5F7] rounded-xl px-3 py-2">
-            <Search size={16} className="text-[#6E6E73] flex-shrink-0" />
+        <div className="px-4 pt-3 pb-2">
+          <div className="flex items-center gap-2 bg-[#ECECF1] rounded-[14px] px-3 py-2.5">
+            <Search size={15} className="text-[#C7C7CC] flex-shrink-0" />
             <input
               autoFocus
               type="text"
               placeholder="Search exercises…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="flex-1 bg-transparent text-[15px] text-[#1D1D1F] placeholder-[#6E6E73] focus:outline-none"
+              className="flex-1 bg-transparent text-[15px] text-[#1C1C1E] placeholder-[#C7C7CC] focus:outline-none"
             />
             {query && (
-              <button onClick={() => setQuery('')} className="text-[#6E6E73]">
-                <X size={14} />
+              <button onClick={() => setQuery('')} className="text-[#C7C7CC]">
+                <X size={13} />
               </button>
             )}
           </div>
         </div>
 
-        <div className="px-4 pb-3 flex gap-2 overflow-x-auto scrollbar-none">
+        <div className="px-4 pb-3 flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={`flex-shrink-0 text-[13px] font-medium px-3 py-1.5 rounded-full transition-colors ${
+              className={`flex-shrink-0 text-[12px] font-semibold px-3 py-1.5 rounded-full transition-colors ${
                 category === cat
-                  ? 'bg-[#0071E3] text-white'
-                  : 'bg-[#F5F5F7] text-[#6E6E73]'
+                  ? 'bg-[#F4845F] text-white'
+                  : 'bg-[#ECECF1] text-[#8E8E93]'
               }`}
             >
               {cat}
@@ -94,21 +97,25 @@ export default function ExerciseDrawer({ open, onClose, onSelect, filterCategory
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-6 flex flex-col gap-2">
+        <div className="flex-1 overflow-y-auto px-4 pb-6 flex flex-col">
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <Loader2 size={28} className="animate-spin text-[#0071E3]" />
+              <Loader2 size={24} className="animate-spin text-[#F4845F]" />
             </div>
           ) : filtered.length === 0 ? (
-            <p className="text-center text-[#6E6E73] py-12">No exercises found</p>
+            <p className="text-center text-[#C7C7CC] text-[14px] py-12">No exercises found</p>
           ) : (
-            filtered.map((ex) => (
-              <ExerciseCard
+            filtered.map((ex, i) => (
+              <div
                 key={ex.id}
-                exercise={ex}
-                mode="library"
-                onSelect={(e) => { onSelect(e); onClose() }}
-              />
+                className={`py-3 ${i < filtered.length - 1 ? 'border-b border-[#E5E5EA]' : ''}`}
+              >
+                <ExerciseCard
+                  exercise={ex}
+                  mode="library"
+                  onSelect={(e) => { onSelect(e); onClose() }}
+                />
+              </div>
             ))
           )}
         </div>
