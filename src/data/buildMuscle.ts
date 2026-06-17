@@ -1,0 +1,178 @@
+import type { Program } from './buffDudes'
+
+export const BUILD_MUSCLE: Program = {
+  id: 'build_muscle',
+  name: '10-Week Muscle Build',
+  fullName: '10-Week Build Muscle Workout Plan',
+  daysPerWeek: 4,
+  schedule: {
+    monday: 'day_1',
+    tuesday: 'day_2',
+    wednesday: 'day_3',
+    thursday: 'rest',
+    friday: 'day_4',
+    saturday: 'rest',
+    sunday: 'rest',
+  },
+  phases: [
+    {
+      id: 'plan_a',
+      name: 'Plan A — Strength',
+      weeks: [1, 3, 5, 7, 9],
+      note: 'Heavy weights, low reps. Alternate with Plan B each week — Plan A on odd weeks (1, 3, 5, 7, 9). Increase weight progressively whenever you hit the top of the rep range on all sets.',
+      days: [
+        {
+          day: 1,
+          focus: 'Chest & Abs',
+          type: 'power',
+          exercises: [
+            { name: 'Barbell Bench Press', sets: 5, reps: '12, 8, 6, 4, 12' },
+            { name: 'Incline Dumbbell Press', sets: 4, reps: '8, 6, 6, 6' },
+            { name: 'Incline Flys', sets: 4, reps: '8, 6, 6, 6' },
+            { name: 'Dips', sets: 4, reps: '8, 6, 6, 6' },
+            { name: 'Weighted Sit-Up', sets: 5, reps: '10' },
+            { name: 'Kneeling Cable Crunch', sets: 4, reps: '8' },
+          ],
+        },
+        {
+          day: 2,
+          focus: 'Legs',
+          type: 'power',
+          exercises: [
+            { name: 'Barbell Squat', sets: 5, reps: '12, 10, 8, 8, 6' },
+            { name: 'Dumbbell Lunge', sets: 4, reps: '12' },
+            { name: 'Leg Press', sets: 4, reps: '10, 8, 6, 6' },
+            { name: 'Leg Extension (Machine)', sets: 4, reps: '12' },
+            { name: 'Barbell Straight Leg Deadlift', sets: 4, reps: '12, 8, 6, 6' },
+            { name: 'Lying Leg Curl', sets: 4, reps: '8' },
+            { name: 'Calf Raises', sets: 5, reps: '12, 10, 10, 8, 12' },
+          ],
+        },
+        {
+          day: 3,
+          focus: 'Arms',
+          type: 'power',
+          exercises: [
+            { name: 'Underhand Pull-Ups', sets: 5, reps: '10' },
+            { name: 'Alternating Bicep Curl', sets: 4, reps: '12, 8, 8, 8' },
+            { name: 'EZ Bar Curl', sets: 4, reps: '12, 8, 6, 6' },
+            { name: 'Lying Triceps Extension', sets: 5, reps: '10, 8, 8, 8' },
+            { name: 'Cable Pushdown', sets: 4, reps: '8, 6, 6, 6' },
+            { name: 'Dumbbell Overhead Extension', sets: 4, reps: '8, 6, 6, 6' },
+          ],
+        },
+        {
+          day: 4,
+          focus: 'Shoulders & Abs',
+          type: 'power',
+          exercises: [
+            { name: 'Seated Dumbbell Shoulder Press', sets: 5, reps: '12, 10, 8, 8, 6' },
+            { name: 'Bent-Over Lateral Raises', sets: 4, reps: '12, 8, 8, 8' },
+            { name: 'Front Raise', sets: 4, reps: '10, 8, 8, 8' },
+            { name: 'Lateral Raise', sets: 4, reps: '12, 10, 10, 10' },
+            { name: 'Cable Upright Row', sets: 4, reps: '12, 8, 8, 8' },
+            { name: 'Medicine Ball Russian Twist', sets: 4, reps: '10, 8, 8, 8' },
+            { name: 'Leg Raise', sets: 4, reps: '12, 10, 10, 10' },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'plan_b',
+      name: 'Plan B — Hypertrophy',
+      weeks: [2, 4, 6, 8, 10],
+      note: 'Lighter weights, higher reps, more volume. Alternate with Plan A each week — Plan B on even weeks (2, 4, 6, 8, 10). Focus on the pump and mind-muscle connection.',
+      days: [
+        {
+          day: 1,
+          focus: 'Back & Biceps',
+          type: 'hypertrophy',
+          exercises: [
+            { name: 'Lat Pull-Down', sets: 5, reps: '12' },
+            { name: 'Barbell Bent-Over Row', sets: 4, reps: '12' },
+            { name: 'Seated Cable Row', sets: 4, reps: '15' },
+            { name: 'Dumbbell Row', sets: 4, reps: '12' },
+            { name: 'Standing Barbell Curl', sets: 5, reps: '12' },
+            { name: 'EZ Bar Curl', sets: 4, reps: '12' },
+            { name: 'Standing Cable Curl', sets: 3, reps: '20' },
+          ],
+        },
+        {
+          day: 2,
+          focus: 'Legs & Abs',
+          type: 'hypertrophy',
+          exercises: [
+            { name: 'Smith Machine Front Squat', sets: 4, reps: '12', homeAlt: 'Front Squat with Barbell' },
+            { name: 'Dumbbell Straight Leg Deadlift', sets: 4, reps: '12' },
+            { name: 'Leg Press', sets: 4, reps: '15' },
+            { name: 'Lying Leg Curl', sets: 4, reps: '15' },
+            { name: 'Leg Extension (Machine)', sets: 4, reps: '15' },
+            { name: 'Calf Raises', sets: 5, reps: '20' },
+            { name: 'Lying Leg Raises', sets: 4, reps: '12' },
+            { name: 'Barbell Roll-Outs', sets: 4, reps: '15' },
+          ],
+        },
+        {
+          day: 3,
+          focus: 'Chest & Abs',
+          type: 'hypertrophy',
+          exercises: [
+            { name: 'Barbell Bench Press', sets: 5, reps: '12' },
+            { name: 'Incline Barbell Press', sets: 4, reps: '12' },
+            { name: 'Decline Bench Press', sets: 4, reps: '15' },
+            { name: 'Pull-Over', sets: 4, reps: '12' },
+            { name: 'Leg Raises', sets: 5, reps: '20' },
+            { name: 'Cable Woodchop', sets: 4, reps: '15' },
+          ],
+        },
+        {
+          day: 4,
+          focus: 'Shoulders & Triceps',
+          type: 'hypertrophy',
+          exercises: [
+            { name: 'Clean and Jerk', sets: 5, reps: '12' },
+            { name: 'Dumbbell Lateral Raise', sets: 4, reps: '12' },
+            { name: 'Dumbbell Front Raise', sets: 4, reps: '15' },
+            { name: 'Bent-Over Lateral Raise', sets: 4, reps: '15' },
+            { name: 'Dumbbell Upright Row', sets: 4, reps: '12' },
+            { name: 'Cable Pushdown', sets: 4, reps: '20' },
+            { name: 'Dumbbell Kickback', sets: 4, reps: '12' },
+            { name: 'Bench Dip', sets: 4, reps: '12' },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'bonus',
+      name: 'Bonus — Full Body',
+      weeks: null,
+      note: 'Full-body superset session. Complete all 5 rounds of the lower-body superset before moving on. Rest 90s between rounds.',
+      days: [
+        {
+          day: 1,
+          focus: 'Lower Body Supersets',
+          exercises: [
+            { name: 'Deadlift (Barbell or Trap Bar) / Goblet Squat', sets: 5, reps: '5 / 10', superset: true,
+              note: 'Deadlift: hinge with flat back, push the ground away. Goblet squat: deep squat, elbows near thighs, drive up explosively.' },
+          ],
+        },
+        {
+          day: 2,
+          focus: 'Upper Body Supersets A',
+          exercises: [
+            { name: 'Incline Dumbbell Bench Press / Rear Delt Fly', sets: 5, reps: '5 / 10', superset: true,
+              note: 'Bench press: lower slowly, pause, press to full extension. Rear delt fly: hinge forward, raise to shoulder height, squeeze blades.' },
+          ],
+        },
+        {
+          day: 3,
+          focus: 'Upper Body Supersets B',
+          exercises: [
+            { name: 'Pull-Up / Push-Up', sets: 4, reps: '5 / max', superset: true,
+              note: 'Pull-up: overhand grip, no kipping, pause at top, lower to dead hang. Push-up: max reps — then push out a couple more.' },
+          ],
+        },
+      ],
+    },
+  ],
+}
