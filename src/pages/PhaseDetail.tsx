@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { getProgram } from '../data/programs'
 import { useCompletedSessions } from '../hooks/useProgramProgress'
+import ScrollReveal from '../components/ScrollReveal'
 import type { ProgramDay } from '../data/buffDudes'
 
 export default function PhaseDetail() {
@@ -25,16 +26,16 @@ export default function PhaseDetail() {
   const currentWeek = ongoing ? Math.floor(completedFor(program.id) / phase.days.length) + 1 : 1
   const weeksToShow: number[] = ongoing ? [currentWeek] : (phase.weeks as number[])
 
-  function dayRow(week: number, day: ProgramDay, isLast: boolean) {
+  function dayRow(week: number, day: ProgramDay, isLast: boolean, idx: number) {
     const done = isComplete(program!.id, phase!.id, week, day.day)
     return (
-      <button
-        key={day.day}
-        onClick={() => navigate(`/program/${program!.id}/${phase!.id}/w/${week}/d/${day.day}`)}
-        className={`w-full text-left py-4 flex items-center gap-3.5 ${
-          !isLast ? 'border-b-[0.5px] border-[#E5E3DD]' : ''
-        } ${done ? 'opacity-40' : ''}`}
-      >
+      <ScrollReveal key={day.day} delay={idx * 40}>
+        <button
+          onClick={() => navigate(`/program/${program!.id}/${phase!.id}/w/${week}/d/${day.day}`)}
+          className={`w-full text-left py-4 flex items-center gap-3.5 ${
+            !isLast ? 'border-b-[0.5px] border-[#E5E3DD]' : ''
+          } ${done ? 'opacity-40' : ''}`}
+        >
         {/* Day number circle */}
         <div
           className={`w-8 h-8 flex items-center justify-center flex-shrink-0 ${
@@ -66,8 +67,9 @@ export default function PhaseDetail() {
           </p>
         </div>
 
-        <ArrowRight size={14} className="text-[#B5B2AA] flex-shrink-0" />
-      </button>
+          <ArrowRight size={14} className="text-[#B5B2AA] flex-shrink-0" />
+        </button>
+      </ScrollReveal>
     )
   }
 
@@ -112,7 +114,7 @@ export default function PhaseDetail() {
             Week {week}
           </p>
           <div className="apex-stagger">
-            {phase.days.map((day, i) => dayRow(week, day, i === phase.days.length - 1))}
+            {phase.days.map((day, i) => dayRow(week, day, i === phase.days.length - 1, i))}
           </div>
         </div>
       ))}

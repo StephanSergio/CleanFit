@@ -6,6 +6,8 @@ import { useProgramProgress, useCompletedSessions, getNextSession } from '../hoo
 import { useExerciseImages } from '../hooks/useExerciseImages'
 import { useWorkouts } from '../hooks/useWorkouts'
 import RestTimer from '../components/RestTimer'
+import ScrollReveal from '../components/ScrollReveal'
+import { useElapsed } from '../hooks/useElapsed'
 import type { WorkoutSet } from '../types'
 
 function parseReps(setsCount: number, repsStr: string): WorkoutSet[] {
@@ -18,21 +20,6 @@ function parseReps(setsCount: number, repsStr: string): WorkoutSet[] {
   }))
 }
 
-function useElapsed(startTime: number) {
-  const tick = () => Math.floor((Date.now() - startTime) / 1000)
-  const [elapsed, setElapsed] = useState(tick)
-  useEffect(() => {
-    setElapsed(tick())
-    const id = setInterval(() => setElapsed(tick()), 1000)
-    // Snap back immediately when the app is foregrounded after being in background.
-    const onVisible = () => { if (document.visibilityState === 'visible') setElapsed(tick()) }
-    document.addEventListener('visibilitychange', onVisible)
-    return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVisible) }
-  }, [startTime])
-  const m = Math.floor(elapsed / 60).toString().padStart(2, '0')
-  const s = (elapsed % 60).toString().padStart(2, '0')
-  return `${m}:${s}`
-}
 
 interface TrackingExercise {
   name: string
@@ -65,6 +52,7 @@ export default function DayWorkout() {
   const { saveWorkout, updateWorkout } = useWorkouts()
   const docIdRef = useRef<string | null>(null)
   const creatingRef = useRef(false)
+  const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const program = getProgram(programId)
   const phase = program?.phases.find((p) => p.id === phaseId)
@@ -133,7 +121,9 @@ export default function DayWorkout() {
     setExercises(next)
     if (!wasCompleted) { setRestKey((k) => k + 1); setRestActive(true) }
     saveSession({ programId: program!.id, programName: program!.name, phaseId: phase!.id, week, dayNum: day!.day, focus: day!.focus })
-    persist(next)
+    // Debounce Firestore writes — rapid set-toggles collapse into one write.
+    if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
+    persistTimerRef.current = setTimeout(() => persist(next), 600)
     if (next.every((ex) => ex.sets.every((s) => s.completed))) markComplete(program!.id, phase!.id, week, day!.day)
   }
 
@@ -142,6 +132,13 @@ export default function DayWorkout() {
       if (i !== exIdx) return ex
       const last = ex.sets[ex.sets.length - 1]
       return { ...ex, sets: [...ex.sets, { reps: last?.reps ?? 10, weightKg: last?.weightKg ?? 10, completed: false }] }
+    }))
+  }
+
+  function removeLastSet(exIdx: number) {
+    setExercises((prev) => prev.map((ex, i) => {
+      if (i !== exIdx || ex.sets.length <= 1) return ex
+      return { ...ex, sets: ex.sets.slice(0, -1) }
     }))
   }
 
@@ -167,6 +164,7 @@ export default function DayWorkout() {
 
   async function finishAndNext() {
     setSaving(true)
+    if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
     await persist(exercises)
     markComplete(program!.id, phase!.id, week, day!.day)
     clearStored(storeKey)
@@ -191,23 +189,24 @@ export default function DayWorkout() {
           <p className="text-[13px] font-light text-[#B5B2AA] mt-3">{day.exercises.length} exercises</p>
         </div>
 
-        <div className="px-6 pt-4 apex-stagger">
+        <div className="px-6 pt-4">
           {day.note && <p className="text-[13px] font-light text-[#636158] leading-relaxed mb-6 tracking-[0.01em]">{day.note}</p>}
           {day.exercises.map((ex, i) => (
-            <button
-              key={i}
-              onClick={() => setTracking(true)}
-              className={`w-full text-left flex items-start py-4 border-b-[0.5px] border-[#E5E3DD] last:border-b-0 active:bg-[#F0EFEC] transition-colors ${ex.superset ? 'pl-4 border-l-[0.5px] border-l-[#22E8E0]' : ''}`}
-            >
-              <span className="text-[11px] font-light text-[#B5B2AA] w-6 flex-shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
-              <div className="flex-1 min-w-0 px-4">
-                <p className="text-[15px] font-light text-[#0F0F0E] tracking-[0.01em] lowercase leading-snug">{ex.name.toLowerCase()}</p>
-                <p className="text-[11px] font-light text-[#636158] mt-0.5 tracking-[0.03em]">
-                  {ex.sets} sets · {ex.reps} reps{ex.homeAlt ? ` · alt: ${ex.homeAlt.toLowerCase()}` : ''}
-                </p>
-              </div>
-              <ArrowLeft size={12} className="text-[#B5B2AA] flex-shrink-0 mt-1 rotate-180" />
-            </button>
+            <ScrollReveal key={i} delay={i * 35} as="div">
+              <button
+                onClick={() => setTracking(true)}
+                className={`w-full text-left flex items-start py-4 border-b-[0.5px] border-[#E5E3DD] last:border-b-0 active:bg-[#F0EFEC] transition-colors ${ex.superset ? 'pl-4 border-l-[0.5px] border-l-[#22E8E0]' : ''}`}
+              >
+                <span className="text-[11px] font-light text-[#B5B2AA] w-6 flex-shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
+                <div className="flex-1 min-w-0 px-4">
+                  <p className="text-[15px] font-light text-[#0F0F0E] tracking-[0.01em] lowercase leading-snug">{ex.name.toLowerCase()}</p>
+                  <p className="text-[11px] font-light text-[#636158] mt-0.5 tracking-[0.03em]">
+                    {ex.sets} sets · {ex.reps} reps{ex.homeAlt ? ` · alt: ${ex.homeAlt.toLowerCase()}` : ''}
+                  </p>
+                </div>
+                <ArrowLeft size={12} className="text-[#B5B2AA] flex-shrink-0 mt-1 rotate-180" />
+              </button>
+            </ScrollReveal>
           ))}
         </div>
 
@@ -322,10 +321,18 @@ export default function DayWorkout() {
                       </button>
                     </div>
                   ))}
-                  <button onClick={() => addSet(exIdx)}
-                    className="mt-1 text-[9px] font-medium text-[#636158] uppercase tracking-[0.2em] py-0.5 text-left">
-                    + set
-                  </button>
+                  <div className="flex items-center gap-3 mt-1">
+                    <button onClick={() => addSet(exIdx)}
+                      className="text-[9px] font-medium text-[#636158] uppercase tracking-[0.2em] py-0.5">
+                      + set
+                    </button>
+                    {ex.sets.length > 1 && (
+                      <button onClick={() => removeLastSet(exIdx)}
+                        className="text-[9px] font-medium text-[#B5B2AA] uppercase tracking-[0.2em] py-0.5">
+                        − set
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

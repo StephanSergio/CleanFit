@@ -1,6 +1,7 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
 import { WorkoutProvider } from './contexts/WorkoutContext'
+import { WorkoutsProvider } from './contexts/WorkoutsContext'
 import BottomNav from './components/BottomNav'
 import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
@@ -28,6 +29,7 @@ function ProtectedLayout() {
   if (!user) return <Navigate to="/auth" replace />
 
   return (
+    <WorkoutsProvider>
     <WorkoutProvider>
       <Routes>
         <Route path="/" element={<Dashboard />} />
@@ -43,6 +45,7 @@ function ProtectedLayout() {
       </Routes>
       <BottomNav />
     </WorkoutProvider>
+    </WorkoutsProvider>
   )
 }
 

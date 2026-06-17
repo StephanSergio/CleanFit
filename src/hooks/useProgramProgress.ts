@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { getProgram } from '../data/programs'
 import { useAuth } from './useAuth'
@@ -62,7 +62,7 @@ export function useProgramProgress() {
     setProgress(null)
     lsWrite(LS_CURRENT, null)
     if (user) {
-      setDoc(doc(db, 'users', user.uid, 'programMeta', 'current'), {})
+      deleteDoc(doc(db, 'users', user.uid, 'programMeta', 'current'))
         .catch(() => {})
     }
   }
@@ -74,7 +74,10 @@ export function useProgramProgress() {
 
 export function useCompletedSessions() {
   const { user } = useAuth()
-  const [keys, setKeys] = useState<string[]>(() => lsRead(LS_COMPLETED, []))
+  // Store as a Set internally for O(1) lookup; serialise to/from array for storage.
+  const [keySet, setKeySet] = useState<Set<string>>(
+    () => new Set<string>(lsRead(LS_COMPLETED, []))
+  )
 
   // Sync from Firestore on mount.
   useEffect(() => {
@@ -83,7 +86,7 @@ export function useCompletedSessions() {
       .then((snap) => {
         if (snap.exists()) {
           const data = (snap.data().keys ?? []) as string[]
-          setKeys(data)
+          setKeySet(new Set(data))
           lsWrite(LS_COMPLETED, data)
         }
       })
@@ -92,25 +95,29 @@ export function useCompletedSessions() {
 
   function markComplete(programId: string, phaseId: string, week: number, day: number) {
     const k = sessionKey(programId, phaseId, week, day)
-    if (keys.includes(k)) return
-    const next = [...keys, k]
-    setKeys(next)
-    lsWrite(LS_COMPLETED, next)
+    if (keySet.has(k)) return
+    const next = new Set(keySet)
+    next.add(k)
+    setKeySet(next)
+    const arr = Array.from(next)
+    lsWrite(LS_COMPLETED, arr)
     if (user) {
-      setDoc(doc(db, 'users', user.uid, 'programMeta', 'completed'), { keys: next })
+      setDoc(doc(db, 'users', user.uid, 'programMeta', 'completed'), { keys: arr })
         .catch(() => {})
     }
   }
 
   function isComplete(programId: string, phaseId: string, week: number, day: number) {
-    return keys.includes(sessionKey(programId, phaseId, week, day))
+    return keySet.has(sessionKey(programId, phaseId, week, day))
   }
 
   function completedFor(programId: string) {
-    return keys.filter((k) => k.startsWith(`${programId}|`)).length
+    let count = 0
+    keySet.forEach((k) => { if (k.startsWith(`${programId}|`)) count++ })
+    return count
   }
 
-  return { markComplete, isComplete, completedCount: keys.length, completedFor }
+  return { markComplete, isComplete, completedCount: keySet.size, completedFor }
 }
 
 // ─── Schedule helpers (no storage) ───────────────────────────────────────────

@@ -1,35 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, Timer } from 'lucide-react'
 import { useWorkout } from '../contexts/WorkoutContext'
 import { useWorkouts } from '../hooks/useWorkouts'
+import { useElapsed } from '../hooks/useElapsed'
 import ExerciseCard from '../components/ExerciseCard'
 import SetRow from '../components/SetRow'
 import ExerciseDrawer from '../components/ExerciseDrawer'
 import RestTimer from '../components/RestTimer'
 import type { WgerExercise } from '../types'
 
-function useTimer(startTime: number | undefined) {
-  const tick = () => startTime ? Math.floor((Date.now() - startTime) / 1000) : 0
-  const [elapsed, setElapsed] = useState(tick)
-  useEffect(() => {
-    if (!startTime) return
-    setElapsed(tick())
-    const id = setInterval(() => setElapsed(tick()), 1000)
-    const onVisible = () => { if (document.visibilityState === 'visible') setElapsed(tick()) }
-    document.addEventListener('visibilitychange', onVisible)
-    return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVisible) }
-  }, [startTime])
-  const m = Math.floor(elapsed / 60).toString().padStart(2, '0')
-  const s = (elapsed % 60).toString().padStart(2, '0')
-  return `${m}:${s}`
-}
-
 export default function Workout() {
   const { workout, dispatch } = useWorkout()
   const { saveWorkout } = useWorkouts()
   const navigate = useNavigate()
-  const timer = useTimer(workout?.startTime)
+  const timer = useElapsed(workout?.startTime)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [swapFor, setSwapFor] = useState<number | null>(null)
   const [finishing, setFinishing] = useState(false)

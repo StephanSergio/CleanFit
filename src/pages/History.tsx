@@ -80,18 +80,11 @@ export default function History() {
       </div>
 
       {/* Workout list */}
+      {!loading && (
       <div className="px-6">
         <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] mb-3">All Workouts</p>
-        {loading ? (
-          <div className="flex flex-col gap-0">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-[#E5E3DD] h-12 animate-pulse mb-[0.5px]" />
-            ))}
-          </div>
-        ) : workouts.length === 0 ? (
-          <div className="border-[0.5px] border-[#E5E3DD] p-10 text-center">
-            <p className="text-[#B5B2AA] text-[13px] font-light lowercase">no workouts yet.</p>
-          </div>
+        {workouts.length === 0 ? (
+          <p className="text-[13px] font-light text-[#B5B2AA] lowercase">no workouts yet.</p>
         ) : (
           <div className="apex-stagger">
             {workouts.map((w, i) => {
@@ -145,6 +138,7 @@ export default function History() {
           </div>
         )}
       </div>
+      )}
     </div>
   )
 }

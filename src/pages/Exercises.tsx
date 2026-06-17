@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Search, X, Loader2 } from 'lucide-react'
+import ScrollReveal from '../components/ScrollReveal'
 import { fetchAllExercises, searchExercises } from '../lib/wger'
 import type { WgerExercise } from '../types'
 import ExerciseCard from '../components/ExerciseCard'
@@ -92,14 +93,13 @@ export default function Exercises() {
         ) : filtered.length === 0 ? (
           <p className="text-center text-[#B5B2AA] text-[13px] font-light lowercase py-12">no exercises found</p>
         ) : (
-          <div className="apex-stagger">
+          <div>
             {filtered.map((ex, i) => (
-              <div
-                key={ex.id}
-                className={`py-3.5 ${i < filtered.length - 1 ? 'border-b-[0.5px] border-[#E5E3DD]' : ''}`}
-              >
-                <ExerciseCard exercise={ex} mode="library" />
-              </div>
+              <ScrollReveal key={ex.id} delay={Math.min(i, 6) * 30}>
+                <div className={`py-3.5 ${i < filtered.length - 1 ? 'border-b-[0.5px] border-[#E5E3DD]' : ''}`}>
+                  <ExerciseCard exercise={ex} mode="library" />
+                </div>
+              </ScrollReveal>
             ))}
           </div>
         )}
