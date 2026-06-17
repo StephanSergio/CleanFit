@@ -35,7 +35,7 @@ function ProtectedLayout() {
         <Route path="/progress" element={<Progress />} />
         <Route path="/program" element={<Program />} />
         <Route path="/program/:phaseId" element={<PhaseDetail />} />
-        <Route path="/program/:phaseId/day/:dayNum" element={<DayWorkout />} />
+        <Route path="/program/:phaseId/w/:week/d/:dayNum" element={<DayWorkout />} />
       </Routes>
       <BottomNav />
     </WorkoutProvider>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { X, RotateCcw } from 'lucide-react'
 
 const PRESETS = [
@@ -15,26 +15,33 @@ interface Props {
 export default function RestTimer({ onDismiss }: Props) {
   const [preset, setPreset] = useState(90)
   const [remaining, setRemaining] = useState(90)
-  const [running, setRunning] = useState(true)
+  const onDismissRef = useRef(onDismiss)
+  onDismissRef.current = onDismiss
 
+  // One stable interval for the component's lifetime. It decrements via a
+  // functional update and fires onDismiss (through a ref) at zero, so it is
+  // immune to parent re-renders recreating the onDismiss prop.
   useEffect(() => {
-    if (!running || remaining <= 0) {
-      if (remaining <= 0) onDismiss()
-      return
-    }
-    const id = setInterval(() => setRemaining((r) => r - 1), 1000)
+    const id = setInterval(() => {
+      setRemaining((r) => {
+        if (r <= 1) {
+          clearInterval(id)
+          onDismissRef.current()
+          return 0
+        }
+        return r - 1
+      })
+    }, 1000)
     return () => clearInterval(id)
-  }, [running, remaining, onDismiss])
+  }, [])
 
   function select(seconds: number) {
     setPreset(seconds)
     setRemaining(seconds)
-    setRunning(true)
   }
 
   function reset() {
     setRemaining(preset)
-    setRunning(true)
   }
 
   const pct = Math.max(0, (remaining / preset) * 100)

@@ -30,6 +30,15 @@ export default function Workout() {
   const [swapFor, setSwapFor] = useState<number | null>(null)
   const [finishing, setFinishing] = useState(false)
   const [restActive, setRestActive] = useState(false)
+  const [restKey, setRestKey] = useState(0)
+
+  function handleToggleSet(exIdx: number, setIdx: number, wasCompleted: boolean) {
+    dispatch({ type: 'TOGGLE_SET', exerciseIndex: exIdx, setIndex: setIdx })
+    if (!wasCompleted) {
+      setRestKey((k) => k + 1)
+      setRestActive(true)
+    }
+  }
 
   if (!workout) {
     return (
@@ -145,7 +154,7 @@ export default function Workout() {
                   setNumber={setIdx + 1}
                   set={set}
                   onChange={(patch) => dispatch({ type: 'UPDATE_SET', exerciseIndex: exIdx, setIndex: setIdx, patch })}
-                  onToggle={() => dispatch({ type: 'TOGGLE_SET', exerciseIndex: exIdx, setIndex: setIdx })}
+                  onToggle={() => handleToggleSet(exIdx, setIdx, set.completed)}
                 />
               ))}
             </div>
@@ -170,7 +179,7 @@ export default function Workout() {
         ))}
       </div>
 
-      {restActive && <RestTimer onDismiss={() => setRestActive(false)} />}
+      {restActive && <RestTimer key={restKey} onDismiss={() => setRestActive(false)} />}
 
       <div
         className="fixed right-5"

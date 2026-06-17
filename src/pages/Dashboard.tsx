@@ -3,8 +3,7 @@ import { Dumbbell, Play, RotateCcw, Zap } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { useWorkout } from '../contexts/WorkoutContext'
-import { useProgramProgress, useCompletedDays } from '../hooks/useProgramProgress'
-import { BUFF_DUDES } from '../data/buffDudes'
+import { useProgramProgress, useCompletedSessions, totalSessions } from '../hooks/useProgramProgress'
 import CircleRing from '../components/CircleRing'
 
 function greeting() {
@@ -23,7 +22,7 @@ export default function Dashboard() {
   const { workouts, loading } = useWorkouts()
   const { dispatch } = useWorkout()
   const { progress } = useProgramProgress()
-  const { isCompletedThisWeek } = useCompletedDays()
+  const { completedCount } = useCompletedSessions()
   const navigate = useNavigate()
 
   const name = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'there'
@@ -33,9 +32,8 @@ export default function Dashboard() {
     return diff <= 7
   }).length
 
-  const completedProgramDays = BUFF_DUDES.phases.reduce(
-    (n, p) => n + p.days.filter((d) => isCompletedThisWeek(p.id, d.day)).length, 0
-  )
+  const completedProgramDays = completedCount
+  const programTotal = totalSessions()
   const weeklyGoal = 4
   const ringPct = Math.min(100, (thisWeek / weeklyGoal) * 100)
 
@@ -74,8 +72,8 @@ export default function Dashboard() {
             <p className="text-[12px] text-[#8E8E93] mt-0.5">Total sessions</p>
           </div>
           <div className="bg-white shadow-sm rounded-[16px] px-4 py-3">
-            <p className="text-[24px] font-bold text-[#1C1C1E] leading-none">{completedProgramDays}</p>
-            <p className="text-[12px] text-[#8E8E93] mt-0.5">Program days done</p>
+            <p className="text-[24px] font-bold text-[#1C1C1E] leading-none">{completedProgramDays}<span className="text-[15px] text-[#C7C7CC]">/{programTotal}</span></p>
+            <p className="text-[12px] text-[#8E8E93] mt-0.5">Program sessions done</p>
           </div>
         </div>
       </div>
@@ -85,7 +83,7 @@ export default function Dashboard() {
         {progress ? (
           <div className="flex flex-col gap-3">
             <button
-              onClick={() => navigate(`/program/${progress.phaseId}/day/${progress.dayNum}`)}
+              onClick={() => navigate(`/program/${progress.phaseId}/w/${progress.week}/d/${progress.dayNum}`)}
               className="w-full bg-[#F4845F] text-white rounded-[16px] px-5 py-4 flex items-center gap-3 active:opacity-80 transition-opacity text-left"
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
@@ -117,7 +115,7 @@ export default function Dashboard() {
         ) : (
           <div className="flex flex-col gap-3">
             <button
-              onClick={() => navigate('/program/phase_1/day/1')}
+              onClick={() => navigate('/program/phase_1/w/1/d/1')}
               className="w-full bg-[#F4845F] text-white rounded-[16px] px-5 py-4 flex items-center gap-3 active:opacity-80 transition-opacity text-left"
             >
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
