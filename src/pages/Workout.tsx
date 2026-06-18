@@ -31,7 +31,7 @@ export default function Workout() {
 
   if (!workout) {
     return (
-      <div className="min-h-screen bg-bg flex flex-col items-center justify-center gap-4 px-6 pb-nav">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6 pb-nav">
         <p className="text-ink-mid text-[15px] font-light lowercase">no active workout.</p>
         <button
           onClick={() => dispatch({ type: 'START' })}
@@ -83,7 +83,7 @@ export default function Workout() {
   const totalSets = workout.exercises.reduce((n, ex) => n + ex.sets.length, 0)
 
   return (
-    <div className="min-h-screen bg-bg pb-nav apex-page-fast">
+    <div className="min-h-screen pb-nav apex-page-fast">
       {/* Sticky header */}
       <div className="sticky top-0 z-10 bg-bg/95 backdrop-blur px-6 pt-14 pb-4 border-b-[0.5px] border-border">
         <div className="flex items-start justify-between gap-2">

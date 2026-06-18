@@ -96,7 +96,7 @@ export default function DayWorkout() {
   }, [exercises, tracking, storeKey, startTime])
 
   if (!program || !phase || !day) {
-    return <div className="min-h-screen bg-bg flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
       <p className="text-ink-muted text-[13px] uppercase tracking-[0.1em]">workout not found</p>
     </div>
   }
@@ -174,7 +174,7 @@ export default function DayWorkout() {
   // ── Pre-workout overview ──────────────────────────────────────
   if (!tracking) {
     return (
-      <div className="min-h-screen bg-bg pb-32 apex-page">
+      <div className="min-h-screen pb-32 apex-page">
         <div className="px-6 pt-14 pb-5 border-b-[0.5px] border-border">
           <button onClick={() => navigate(`/program/${program.id}/${phaseId}`)}
             className="flex items-center gap-2 text-ink-muted text-[11px] uppercase tracking-[0.14em] mb-6">
@@ -224,7 +224,7 @@ export default function DayWorkout() {
 
   // ── Active tracking ───────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-bg pb-44 apex-page-fast">
+    <div className="min-h-screen pb-44 apex-page-fast">
       {scrolled && (
         <button onClick={() => setRestActive(true)}
           className="fixed right-6 z-20 flex items-center gap-1.5 bg-surface border-[0.5px] border-border px-4 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-ink"

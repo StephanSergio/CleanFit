@@ -8,7 +8,7 @@ export default function Programs() {
   const { progress } = useProgramProgress()
 
   return (
-    <div className="min-h-screen bg-bg pb-nav apex-page">
+    <div className="min-h-screen pb-nav apex-page">
       {/* Header */}
       <div className="px-6 pt-14 pb-6">
         <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-2">
