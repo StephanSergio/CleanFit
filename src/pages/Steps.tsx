@@ -5,8 +5,15 @@ import {
   Tooltip, ResponsiveContainer, Cell, ReferenceLine,
 } from 'recharts'
 import { useSteps } from '../contexts/StepsContext'
+import { useTheme } from '../contexts/ThemeContext'
 
 const GOAL = 10_000
+
+// Concrete colours for recharts (SVG attributes don't resolve CSS vars reliably).
+const CHART = {
+  light: { accent: '#4f46e5', ink: '#1a1a1a', grid: '#e3e0d9', axis: '#B5B2AA', surface: '#faf9f6', track: '#e3e0d9', cursor: '#f5f3ef' },
+  dark:  { accent: '#6366f1', ink: '#f3f1ec', grid: '#2a2a26', axis: '#6f6c63', surface: '#1b1b18', track: '#2a2a26', cursor: '#1b1b18' },
+}
 
 function todayStr() {
   return new Date().toISOString().split('T')[0]
@@ -20,6 +27,8 @@ function fmtDate(dateStr: string) {
 
 export default function Steps() {
   const { entries, loading, logSteps, removeEntry } = useSteps()
+  const { isDark } = useTheme()
+  const c = isDark ? CHART.dark : CHART.light
   const [date, setDate] = useState(todayStr())
   const [stepsInput, setStepsInput] = useState('')
   const [saving, setSaving] = useState(false)
@@ -71,61 +80,62 @@ export default function Steps() {
     const n = parseInt(stepsInput, 10)
     if (!date || isNaN(n) || n < 0) return
     setSaving(true)
-    try {
-      await logSteps(date, n)
-      setStepsInput('')
-      setDate(todayStr())
-    } finally {
-      setSaving(false)
-    }
+    // Optimistic: the write lands in the local cache immediately and onSnapshot
+    // reflects it right away, so we don't block the UI on a server round-trip.
+    // The promise only settles once synced — offline it stays pending, which is
+    // fine because the entry is already persisted locally and will sync later.
+    logSteps(date, n).catch(() => {})
+    setStepsInput('')
+    setDate(todayStr())
+    setSaving(false)
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center">
-        <div className="w-8 h-8 border-[0.5px] border-[#0F0F0E] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <div className="w-8 h-8 border-[0.5px] border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] pb-nav apex-page">
+    <div className="min-h-screen bg-bg pb-nav apex-page">
 
       {/* Header */}
       <div className="px-6 pt-14 pb-6">
-        <h1 className="text-[44px] font-extralight text-[#0F0F0E] lowercase">steps</h1>
+        <h1 className="text-[44px] font-extralight text-ink lowercase">steps</h1>
       </div>
 
       {/* Today hero */}
       <div className="px-6 mb-5 apex-fade">
         <div
-          className="bg-white p-5 transition-all duration-500"
-          style={{ border: `0.5px solid ${goalMet ? '#22E8E0' : '#E5E3DD'}` }}
+          className="bg-surface p-5 transition-all duration-500"
+          style={{ border: `0.5px solid ${goalMet ? 'var(--color-accent)' : 'var(--color-border)'}` }}
         >
           <div className="flex items-end justify-between mb-4">
             <div>
-              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] mb-1.5">Today</p>
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-1.5">Today</p>
               <p
                 className="text-[52px] font-extralight leading-none tabular-nums transition-colors duration-500"
-                style={{ color: goalMet ? '#22E8E0' : '#0F0F0E' }}
+                style={{ color: goalMet ? 'var(--color-accent)' : 'var(--color-ink)' }}
               >
                 {todaySteps.toLocaleString()}
               </p>
             </div>
             <div className="text-right mb-1">
-              <p className="text-[11px] font-light text-[#B5B2AA]">goal</p>
-              <p className="text-[13px] font-light text-[#636158]">{GOAL.toLocaleString()}</p>
+              <p className="text-[11px] font-light text-ink-muted">goal</p>
+              <p className="text-[13px] font-light text-ink-mid">{GOAL.toLocaleString()}</p>
             </div>
           </div>
           {/* Progress bar */}
-          <div className="h-[1px] bg-[#E5E3DD] overflow-hidden">
+          <div className="h-[1px] bg-border overflow-hidden">
             <div
-              className="h-[1px] bg-[#22E8E0] transition-all duration-700"
+              className="h-[1px] bg-accent transition-all duration-700"
               style={{ width: `${goalPct}%` }}
             />
           </div>
           {goalMet && (
-            <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-[#22E8E0] mt-2">
+            <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-accent mt-2">
               goal reached
             </p>
           )}
@@ -134,38 +144,38 @@ export default function Steps() {
 
       {/* Stat cards */}
       <div className="px-6 mb-5 grid grid-cols-2 gap-3 apex-stagger">
-        <div className="bg-white border-[0.5px] border-[#E5E3DD] px-4 py-4">
-          <p className="text-[28px] font-extralight text-[#0F0F0E] leading-none tabular-nums">
+        <div className="bg-surface border-[0.5px] border-border px-4 py-4">
+          <p className="text-[28px] font-extralight text-ink leading-none tabular-nums">
             {weeklyAvg.toLocaleString()}
           </p>
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] mt-1">7-day avg</p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mt-1">7-day avg</p>
         </div>
-        <div className="bg-white border-[0.5px] border-[#E5E3DD] px-4 py-4">
-          <p className="text-[28px] font-extralight text-[#0F0F0E] leading-none tabular-nums">
+        <div className="bg-surface border-[0.5px] border-border px-4 py-4">
+          <p className="text-[28px] font-extralight text-ink leading-none tabular-nums">
             {bestDay.toLocaleString()}
           </p>
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] mt-1">best day</p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mt-1">best day</p>
         </div>
       </div>
 
       {/* Log form */}
       <div className="px-6 mb-5">
-        <div className="bg-white border-[0.5px] border-[#E5E3DD] p-4">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] mb-4">Log Steps</p>
+        <div className="bg-surface border-[0.5px] border-border p-4">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-4">Log Steps</p>
           <div className="flex gap-3 items-end">
             <div className="flex-1">
-              <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-[#B5B2AA] mb-2">Date</p>
+              <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-ink-muted mb-2">Date</p>
               <input
                 type="date"
                 value={date}
                 max={todayStr()}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-transparent border-b-[0.5px] border-[#E5E3DD] rounded-none px-0 py-2 font-light text-[#0F0F0E] focus:outline-none appearance-none"
+                className="w-full bg-transparent border-b-[0.5px] border-border rounded-none px-0 py-2 font-light text-ink focus:outline-none appearance-none"
                 style={{ fontSize: 16 }}
               />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-[#B5B2AA] mb-2">Steps</p>
+              <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-ink-muted mb-2">Steps</p>
               <input
                 type="number"
                 value={stepsInput}
@@ -173,7 +183,7 @@ export default function Steps() {
                 placeholder="0"
                 min="0"
                 max="99999"
-                className="w-full bg-transparent border-b-[0.5px] border-[#E5E3DD] rounded-none px-0 py-2 font-light text-[#0F0F0E] focus:outline-none"
+                className="w-full bg-transparent border-b-[0.5px] border-border rounded-none px-0 py-2 font-light text-ink focus:outline-none"
                 style={{ fontSize: 16 }}
                 onKeyDown={(e) => e.key === 'Enter' && handleLog()}
               />
@@ -181,11 +191,11 @@ export default function Steps() {
             <button
               onClick={handleLog}
               disabled={!stepsInput || saving}
-              className="flex items-center justify-center w-10 h-10 bg-[#0F0F0E] flex-shrink-0 transition-opacity disabled:opacity-30 active:opacity-70"
+              className="flex items-center justify-center w-10 h-10 bg-accent flex-shrink-0 transition-opacity disabled:opacity-30 active:opacity-70"
             >
               {saving
-                ? <div className="w-4 h-4 border border-[#22E8E0] border-t-transparent rounded-full animate-spin" />
-                : <Check size={16} strokeWidth={1.5} color="#22E8E0" />
+                ? <div className="w-4 h-4 border border-white border-t-transparent rounded-full animate-spin" />
+                : <Check size={16} strokeWidth={1.5} color="#ffffff" />
               }
             </button>
           </div>
@@ -194,19 +204,19 @@ export default function Steps() {
 
       {/* 7-day bar chart */}
       <div className="px-6 mb-5">
-        <div className="bg-white border-[0.5px] border-[#E5E3DD] p-4">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] mb-4">Last 7 Days</p>
+        <div className="bg-surface border-[0.5px] border-border p-4">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-4">Last 7 Days</p>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={chartData} margin={{ top: 8, right: 0, bottom: 0, left: -30 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E3DD" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={c.grid} vertical={false} />
               <XAxis
                 dataKey="label"
-                tick={{ fontSize: 11, fill: '#B5B2AA' }}
+                tick={{ fontSize: 11, fill: c.axis }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fontSize: 11, fill: '#B5B2AA' }}
+                tick={{ fontSize: 11, fill: c.axis }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(v) => v >= 1000 ? `${v / 1000}k` : v}
@@ -214,17 +224,17 @@ export default function Steps() {
               <Tooltip
                 contentStyle={{
                   borderRadius: 0,
-                  border: '0.5px solid #E5E3DD',
-                  background: '#FFFFFF',
-                  color: '#0F0F0E',
+                  border: `0.5px solid ${c.grid}`,
+                  background: c.surface,
+                  color: c.ink,
                   fontSize: 13,
                 }}
                 formatter={(v) => [typeof v === 'number' ? v.toLocaleString() : v, 'steps']}
-                cursor={{ fill: '#F8F7F4' }}
+                cursor={{ fill: c.cursor }}
               />
               <ReferenceLine
                 y={GOAL}
-                stroke="#22E8E0"
+                stroke={c.accent}
                 strokeDasharray="4 3"
                 strokeWidth={0.75}
               />
@@ -232,13 +242,13 @@ export default function Steps() {
                 {chartData.map((entry, i) => (
                   <Cell
                     key={i}
-                    fill={entry.steps >= GOAL ? '#22E8E0' : entry.isToday ? '#0F0F0E' : '#E5E3DD'}
+                    fill={entry.steps >= GOAL ? c.accent : entry.isToday ? c.ink : c.grid}
                   />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-[#22E8E0] mt-1 text-right">
+          <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-accent mt-1 text-right">
             — goal {GOAL.toLocaleString()}
           </p>
         </div>
@@ -246,12 +256,12 @@ export default function Steps() {
 
       {/* History */}
       <div className="px-6">
-        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] mb-3">History</p>
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-3">History</p>
         {entries.length === 0 ? (
-          <div className="border-[0.5px] border-[#E5E3DD] p-10 text-center">
-            <Footprints size={36} strokeWidth={1} className="mx-auto mb-3" style={{ color: '#B5B2AA' }} />
-            <p className="text-[#B5B2AA] text-[13px] font-light lowercase">no steps logged yet.</p>
-            <p className="text-[#B5B2AA] text-[11px] font-light lowercase mt-1">tap log steps above to get started.</p>
+          <div className="border-[0.5px] border-border p-10 text-center">
+            <Footprints size={36} strokeWidth={1} className="mx-auto mb-3" style={{ color: 'var(--color-ink-muted)' }} />
+            <p className="text-ink-muted text-[13px] font-light lowercase">no steps logged yet.</p>
+            <p className="text-ink-muted text-[11px] font-light lowercase mt-1">tap log steps above to get started.</p>
           </div>
         ) : (
           <div className="apex-stagger">
@@ -262,35 +272,35 @@ export default function Steps() {
                 <div
                   key={entry.date}
                   className={`py-3.5 cursor-pointer active:opacity-70 transition-opacity ${
-                    i < entries.length - 1 ? 'border-b-[0.5px] border-[#E5E3DD]' : ''
+                    i < entries.length - 1 ? 'border-b-[0.5px] border-border' : ''
                   }`}
                   onClick={() => loadEntry(entry)}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[14px] font-light text-[#0F0F0E]">{fmtDate(entry.date)}</span>
+                    <span className="text-[14px] font-light text-ink">{fmtDate(entry.date)}</span>
                     <div className="flex items-center gap-2.5">
                       <span
                         className="text-[15px] font-light tabular-nums transition-colors"
-                        style={{ color: met ? '#22E8E0' : '#0F0F0E' }}
+                        style={{ color: met ? 'var(--color-accent)' : 'var(--color-ink)' }}
                       >
                         {entry.steps.toLocaleString()}
                       </span>
                       <button
                         onClick={(e) => { e.stopPropagation(); removeEntry(entry.date) }}
-                        className="w-6 h-6 flex items-center justify-center text-[#E5E3DD] active:text-[#B5B2AA] transition-colors"
+                        className="w-6 h-6 flex items-center justify-center text-border active:text-ink-muted transition-colors"
                       >
                         <X size={12} />
                       </button>
                     </div>
                   </div>
                   {/* Mini goal bar */}
-                  <div className="h-[1px] bg-[#E5E3DD] overflow-hidden">
+                  <div className="h-[1px] bg-border overflow-hidden">
                     <div
                       className="h-[1px] transition-all duration-500"
                       style={{
                         width: `${pct}%`,
-                        background: '#22E8E0',
-                        opacity: met ? 1 : 0.45,
+                        background: 'var(--color-accent)',
+                        opacity: met ? 1 : 0.4,
                       }}
                     />
                   </div>

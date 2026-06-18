@@ -15,12 +15,11 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-[#F8F7F4]"
+      className="fixed bottom-0 left-0 right-0 bg-bg"
       style={{
-        borderRadius: 0,
         height: 'calc(72px + env(safe-area-inset-bottom, 0px))',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        borderTop: '0.5px solid #E5E3DD',
+        borderTop: '0.5px solid var(--color-border)',
       }}
     >
       <div className="flex items-center justify-around h-[72px] px-2">
@@ -29,28 +28,16 @@ export default function BottomNav() {
             key={to}
             to={to}
             end={!!end}
-            className="flex-1 flex flex-col items-center justify-center gap-1"
+            className="flex-1 flex flex-col items-center justify-center gap-1 active:scale-[0.97] transition-transform duration-100"
             aria-label={label}
           >
             {({ isActive }) => (
               <>
-                <div
-                  className="flex items-center justify-center transition-colors transition-all duration-150 rounded-none"
-                  style={{
-                    width: 40,
-                    height: 40,
-                    background: isActive ? '#0F0F0E' : 'transparent',
-                  }}
-                >
-                  <Icon
-                    size={20}
-                    strokeWidth={1.5}
-                    color={isActive ? '#FFFFFF' : '#B5B2AA'}
-                  />
+                <div className={`flex items-center justify-center w-10 h-10 ${isActive ? 'text-accent' : 'text-ink-muted'}`}>
+                  <Icon size={20} strokeWidth={isActive ? 2 : 1.5} />
                 </div>
                 <span
-                  className="text-[9px] font-medium uppercase tracking-[0.1em]"
-                  style={{ color: isActive ? '#0F0F0E' : '#B5B2AA' }}
+                  className={`text-[9px] font-medium uppercase tracking-[0.1em] ${isActive ? 'text-accent' : 'text-ink-muted'}`}
                 >
                   {label}
                 </span>
@@ -60,23 +47,21 @@ export default function BottomNav() {
         ))}
 
         {/* Profile */}
-        <NavLink to="/profile" className="flex-1 flex flex-col items-center justify-center gap-1" aria-label="Profile">
+        <NavLink to="/profile" className="flex-1 flex flex-col items-center justify-center gap-1 active:scale-[0.97] transition-transform duration-100" aria-label="Profile">
           {({ isActive }) => (
             <>
               <div
-                className="flex items-center justify-center text-[12px] font-light text-white transition-all duration-150 rounded-none"
+                className="flex items-center justify-center text-[12px] font-light bg-ink text-bg transition-all duration-150"
                 style={{
                   width: 32,
                   height: 32,
-                  background: '#0F0F0E',
-                  border: isActive ? '0.5px solid #22E8E0' : '0.5px solid transparent',
+                  border: isActive ? '1.5px solid var(--color-accent)' : '0.5px solid transparent',
                 }}
               >
                 {initial}
               </div>
               <span
-                className="text-[9px] font-medium uppercase tracking-[0.1em]"
-                style={{ color: isActive ? '#0F0F0E' : '#B5B2AA' }}
+                className={`text-[9px] font-medium uppercase tracking-[0.1em] ${isActive ? 'text-accent' : 'text-ink-muted'}`}
               >
                 You
               </span>

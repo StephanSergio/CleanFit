@@ -14,8 +14,8 @@ export default function PhaseDetail() {
 
   if (!program || !phase) {
     return (
-      <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center">
-        <p className="text-[15px] font-light text-[#B5B2AA]">Not found.</p>
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <p className="text-[15px] font-light text-ink-muted">Not found.</p>
       </div>
     )
   }
@@ -32,68 +32,68 @@ export default function PhaseDetail() {
       <ScrollReveal key={day.day} delay={idx * 40}>
         <button
           onClick={() => navigate(`/program/${program!.id}/${phase!.id}/w/${week}/d/${day.day}`)}
-          className={`w-full text-left py-4 flex items-center gap-3.5 ${
-            !isLast ? 'border-b-[0.5px] border-[#E5E3DD]' : ''
+          className={`w-full text-left py-4 flex items-center gap-3.5 active:scale-[0.97] transition-transform duration-100 ${
+            !isLast ? 'border-b-[0.5px] border-border' : ''
           } ${done ? 'opacity-40' : ''}`}
         >
         {/* Day number circle */}
         <div
           className={`w-8 h-8 flex items-center justify-center flex-shrink-0 ${
             done
-              ? 'bg-[#22E8E0] border-[0.5px] border-[#22E8E0]'
-              : 'border-[0.5px] border-[#0F0F0E]'
+              ? 'bg-accent border-[0.5px] border-accent'
+              : 'border-[0.5px] border-ink'
           }`}
         >
           {done
-            ? <Check size={13} className="text-[#0F0F0E]" strokeWidth={2} />
-            : <span className="text-[12px] font-light text-[#0F0F0E]">{day.day}</span>
+            ? <Check size={13} className="text-white" strokeWidth={2} />
+            : <span className="text-[12px] font-light text-ink">{day.day}</span>
           }
         </div>
 
         {/* Day info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-[15px] font-light text-[#0F0F0E] lowercase tracking-[0.01em] leading-tight">
+            <p className="text-[15px] font-light text-ink lowercase tracking-[0.01em] leading-tight">
               {day.focus}
             </p>
             {day.type && (
-              <span className="border-[0.5px] border-[#E5E3DD] text-[9px] font-medium uppercase tracking-[0.14em] text-[#B5B2AA] px-2 py-0.5 rounded-[6px]">
+              <span className="border-[0.5px] border-border text-[9px] font-medium uppercase tracking-[0.14em] text-ink-muted px-2 py-0.5 rounded-[6px]">
                 {day.type}
               </span>
             )}
           </div>
-          <p className="text-[11px] font-light text-[#636158] mt-0.5">
+          <p className="text-[11px] font-light text-ink-mid mt-0.5">
             {day.exercises.length} exercises{done ? ' · done' : ''}
           </p>
         </div>
 
-          <ArrowRight size={14} className="text-[#B5B2AA] flex-shrink-0" />
+          <ArrowRight size={14} className="text-ink-muted flex-shrink-0" />
         </button>
       </ScrollReveal>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] pb-nav apex-page">
+    <div className="min-h-screen bg-bg pb-nav apex-page">
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 bg-[#F8F7F4] px-6 pt-14 pb-5 border-b-[0.5px] border-[#E5E3DD]">
+      <div className="sticky top-0 z-10 bg-bg px-6 pt-14 pb-5 border-b-[0.5px] border-border">
         <button
           onClick={() => navigate(`/program/${program.id}`)}
-          className="flex items-center gap-1.5 text-[#B5B2AA] text-[11px] font-medium uppercase tracking-[0.14em] mb-4"
+          className="flex items-center gap-1.5 text-ink-muted text-[11px] font-medium uppercase tracking-[0.14em] mb-4"
         >
           <ArrowLeft size={14} />
           {program.name.toLowerCase()}
         </button>
 
-        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#636158] mb-1">
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-mid mb-1">
           {program.phases.length > 1
             ? `Phase ${phaseIndex} of ${program.phases.length}`
             : 'Weekly Cycle'}
         </p>
-        <h1 className="text-[28px] font-light text-[#0F0F0E] lowercase">
+        <h1 className="text-[28px] font-light text-ink lowercase">
           {phase.name}
         </h1>
-        <p className="text-[13px] font-light text-[#636158] mt-1">
+        <p className="text-[13px] font-light text-ink-mid mt-1">
           {ongoing
             ? `${phase.days.length} days/week · repeats indefinitely`
             : `Weeks ${(phase.weeks as number[])[0]}–${(phase.weeks as number[])[(phase.weeks as number[]).length - 1]} · ${phase.days.length} days/week`}
@@ -102,15 +102,15 @@ export default function PhaseDetail() {
 
       {/* Phase note */}
       {phase.note && (
-        <div className="px-6 py-4 border-b-[0.5px] border-[#E5E3DD]">
-          <p className="text-[13px] font-light text-[#636158] leading-relaxed">{phase.note}</p>
+        <div className="px-6 py-4 border-b-[0.5px] border-border">
+          <p className="text-[13px] font-light text-ink-mid leading-relaxed">{phase.note}</p>
         </div>
       )}
 
       {/* Weeks */}
       {weeksToShow.map((week) => (
         <div key={week} className="px-6">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#636158] pt-6 pb-2">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-mid pt-6 pb-2">
             Week {week}
           </p>
           <div className="apex-stagger">

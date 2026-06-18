@@ -96,8 +96,8 @@ export default function DayWorkout() {
   }, [exercises, tracking, storeKey, startTime])
 
   if (!program || !phase || !day) {
-    return <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center">
-      <p className="text-[#B5B2AA] text-[13px] uppercase tracking-[0.1em]">workout not found</p>
+    return <div className="min-h-screen bg-bg flex items-center justify-center">
+      <p className="text-ink-muted text-[13px] uppercase tracking-[0.1em]">workout not found</p>
     </div>
   }
 
@@ -121,7 +121,6 @@ export default function DayWorkout() {
     setExercises(next)
     if (!wasCompleted) { setRestKey((k) => k + 1); setRestActive(true) }
     saveSession({ programId: program!.id, programName: program!.name, phaseId: phase!.id, week, dayNum: day!.day, focus: day!.focus })
-    // Debounce Firestore writes — rapid set-toggles collapse into one write.
     if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
     persistTimerRef.current = setTimeout(() => persist(next), 600)
     if (next.every((ex) => ex.sets.every((s) => s.completed))) markComplete(program!.id, phase!.id, week, day!.day)
@@ -172,48 +171,50 @@ export default function DayWorkout() {
     else navigate(`/program/${program!.id}`)
   }
 
-  // ── Pre-workout overview (light APEX) ─────────────────────────
+  // ── Pre-workout overview ──────────────────────────────────────
   if (!tracking) {
     return (
-      <div className="min-h-screen bg-[#F8F7F4] pb-32 apex-page">
-        <div className="px-6 pt-14 pb-5 border-b-[0.5px] border-[#E5E3DD]">
+      <div className="min-h-screen bg-bg pb-32 apex-page">
+        <div className="px-6 pt-14 pb-5 border-b-[0.5px] border-border">
           <button onClick={() => navigate(`/program/${program.id}/${phaseId}`)}
-            className="flex items-center gap-2 text-[#B5B2AA] text-[11px] uppercase tracking-[0.14em] mb-6">
+            className="flex items-center gap-2 text-ink-muted text-[11px] uppercase tracking-[0.14em] mb-6">
             <ArrowLeft size={14} /> {program.name.toLowerCase()}
           </button>
           <p className="t-eyebrow mb-3">
             {program.phases.length > 1 ? `Phase ${phaseIndex} · ` : ''}Week {week} · Day {day.day}
-            {day.type && <span className="ml-2 border-[0.5px] border-[#22E8E0] text-[#22E8E0] px-2 py-0.5 rounded-[6px]">{day.type}</span>}
+            {day.type && (
+              <span className="ml-2 border-[0.5px] border-accent text-accent px-2 py-0.5 rounded-[6px]">{day.type}</span>
+            )}
           </p>
-          <h1 className="t-hero text-[#0F0F0E]">{day.focus.toLowerCase()}</h1>
-          <p className="text-[13px] font-light text-[#B5B2AA] mt-3">{day.exercises.length} exercises</p>
+          <h1 className="t-hero text-ink">{day.focus.toLowerCase()}</h1>
+          <p className="text-[13px] font-light text-ink-muted mt-3">{day.exercises.length} exercises</p>
         </div>
 
         <div className="px-6 pt-4">
-          {day.note && <p className="text-[13px] font-light text-[#636158] leading-relaxed mb-6 tracking-[0.01em]">{day.note}</p>}
+          {day.note && <p className="text-[13px] font-light text-ink-mid leading-relaxed mb-6 tracking-[0.01em]">{day.note}</p>}
           {day.exercises.map((ex, i) => (
             <ScrollReveal key={i} delay={i * 35} as="div">
               <button
                 onClick={() => setTracking(true)}
-                className={`w-full text-left flex items-start py-4 border-b-[0.5px] border-[#E5E3DD] last:border-b-0 active:bg-[#F0EFEC] transition-colors ${ex.superset ? 'pl-4 border-l-[0.5px] border-l-[#22E8E0]' : ''}`}
+                className={`w-full text-left flex items-start py-4 border-b-[0.5px] border-border last:border-b-0 active:bg-accent-bg transition-colors ${ex.superset ? 'pl-4 border-l-[0.5px] border-l-accent' : ''}`}
               >
-                <span className="text-[11px] font-light text-[#B5B2AA] w-6 flex-shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
+                <span className="text-[11px] font-light text-ink-muted w-6 flex-shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
                 <div className="flex-1 min-w-0 px-4">
-                  <p className="text-[15px] font-light text-[#0F0F0E] tracking-[0.01em] lowercase leading-snug">{ex.name.toLowerCase()}</p>
-                  <p className="text-[11px] font-light text-[#636158] mt-0.5 tracking-[0.03em]">
+                  <p className="text-[15px] font-light text-ink tracking-[0.01em] lowercase leading-snug">{ex.name.toLowerCase()}</p>
+                  <p className="text-[11px] font-light text-ink-mid mt-0.5 tracking-[0.03em]">
                     {ex.sets} sets · {ex.reps} reps{ex.homeAlt ? ` · alt: ${ex.homeAlt.toLowerCase()}` : ''}
                   </p>
                 </div>
-                <ArrowLeft size={12} className="text-[#B5B2AA] flex-shrink-0 mt-1 rotate-180" />
+                <ArrowLeft size={12} className="text-ink-muted flex-shrink-0 mt-1 rotate-180" />
               </button>
             </ScrollReveal>
           ))}
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 px-6 pt-8 pb-6 bg-[#F8F7F4]"
+        <div className="fixed bottom-0 left-0 right-0 px-6 pt-8 pb-6 bg-bg"
           style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
           <button onClick={() => setTracking(true)}
-            className="w-full bg-[#22E8E0] text-[#0F0F0E] py-[18px] t-cta active:opacity-75 transition-opacity active:scale-[0.97] transition-transform duration-150">
+            className="w-full bg-accent text-white py-[18px] t-cta active:opacity-80 active:scale-[0.97] transition-all duration-100">
             Start Workout
           </button>
         </div>
@@ -221,39 +222,39 @@ export default function DayWorkout() {
     )
   }
 
-  // ── Active tracking (warm cream APEX light) ───────────────────
+  // ── Active tracking ───────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#F8F7F4] pb-44 apex-page-fast">
+    <div className="min-h-screen bg-bg pb-44 apex-page-fast">
       {scrolled && (
         <button onClick={() => setRestActive(true)}
-          className="fixed right-6 z-20 flex items-center gap-1.5 bg-white border-[0.5px] border-[#E5E3DD] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-[#0F0F0E]"
+          className="fixed right-6 z-20 flex items-center gap-1.5 bg-surface border-[0.5px] border-border px-4 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-ink"
           style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
-          <Timer size={13} className="text-[#22E8E0]" /> Rest
+          <Timer size={13} className="text-accent" /> Rest
         </button>
       )}
 
-      <div className="px-6 pt-14 pb-4 border-b-[0.5px] border-[#E5E3DD]">
+      <div className="px-6 pt-14 pb-4 border-b-[0.5px] border-border">
         <button onClick={() => navigate(`/program/${program.id}/${phaseId}`)}
-          className="flex items-center gap-2 text-[#636158] text-[11px] uppercase tracking-[0.14em] mb-5">
+          className="flex items-center gap-2 text-ink-mid text-[11px] uppercase tracking-[0.14em] mb-5">
           <ArrowLeft size={14} /> {program.name.toLowerCase()}
         </button>
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <p className="t-eyebrow mb-1" style={{ color: '#636158' }}>
+            <p className="t-eyebrow mb-1" style={{ color: 'var(--color-ink-mid)' }}>
               {program.phases.length > 1 ? `Phase ${phaseIndex} · ` : ''}Week {week} · Day {day.day}
             </p>
-            <h1 className="text-[22px] font-extralight text-[#0F0F0E] lowercase tracking-[0.01em] truncate">{day.focus.toLowerCase()}</h1>
+            <h1 className="text-[22px] font-extralight text-ink lowercase tracking-[0.01em] truncate">{day.focus.toLowerCase()}</h1>
             <div className="flex items-center gap-4 mt-1">
-              <div className="flex items-center gap-1.5 text-[#636158] text-[11px] tracking-[0.05em]">
+              <div className="flex items-center gap-1.5 text-ink-mid text-[11px] tracking-[0.05em]">
                 <Clock size={11} />
                 <span className="tabular-nums">{timer}</span>
               </div>
-              <span className="text-[11px] text-[#636158] tracking-[0.05em]">{completedSets}/{totalSets} sets</span>
+              <span className="text-[11px] text-ink-mid tracking-[0.05em]">{completedSets}/{totalSets} sets</span>
             </div>
           </div>
           <button onClick={() => setRestActive(true)}
-            className="flex items-center gap-1.5 bg-white border-[0.5px] border-[#E5E3DD] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-[#0F0F0E] flex-shrink-0">
-            <Timer size={13} className="text-[#22E8E0]" /> Rest
+            className="flex items-center gap-1.5 bg-surface border-[0.5px] border-border px-4 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-ink flex-shrink-0">
+            <Timer size={13} className="text-accent" /> Rest
           </button>
         </div>
       </div>
@@ -265,29 +266,29 @@ export default function DayWorkout() {
           const imgUrl = getImage(ex.name)
 
           return (
-            <div key={exIdx} className={`flex overflow-hidden border-[0.5px] border-[#E5E3DD] bg-white transition-opacity ${exDone ? 'opacity-40' : ''}`}>
-              {/* Left — photo, fixed width so right side always has room */}
+            <div key={exIdx} className={`flex overflow-hidden border-[0.5px] border-border bg-surface transition-opacity ${exDone ? 'opacity-40' : ''}`}>
+              {/* Left — photo */}
               <div className="w-[38%] flex-shrink-0 min-h-[140px] bg-[#EBEBEB] overflow-hidden flex items-center justify-center">
                 {imgUrl
                   ? <img src={imgUrl} alt={ex.name} loading="lazy" className="w-full h-full object-cover grayscale" />
-                  : <span className="text-[28px] font-extralight text-[#B5B2AA]">{ex.name.charAt(0).toLowerCase()}</span>
+                  : <span className="text-[28px] font-extralight text-ink-muted">{ex.name.charAt(0).toLowerCase()}</span>
                 }
               </div>
 
-              {/* Right half — title + sets */}
+              {/* Right — title + sets */}
               <div className="flex-1 min-w-0 p-3 flex flex-col">
                 {ex.superset && (
-                  <p className="text-[9px] font-medium text-[#22E8E0] uppercase tracking-[0.2em] mb-0.5">Superset</p>
+                  <p className="text-[9px] font-medium text-accent uppercase tracking-[0.2em] mb-0.5">Superset</p>
                 )}
                 <div className="flex items-start gap-1 mb-0.5">
-                  <p className={`text-[13px] font-light lowercase tracking-[0.01em] leading-tight flex-1 ${exDone ? 'text-[#636158]' : 'text-[#0F0F0E]'}`}>
+                  <p className={`text-[13px] font-light lowercase tracking-[0.01em] leading-tight flex-1 ${exDone ? 'text-ink-mid' : 'text-ink'}`}>
                     {ex.name.toLowerCase()}
                   </p>
-                  {exDone && <CheckCircle2 size={14} className="text-[#22E8E0] flex-shrink-0 mt-0.5" />}
+                  {exDone && <CheckCircle2 size={14} className="text-accent flex-shrink-0 mt-0.5" />}
                 </div>
                 <div className="flex items-center gap-2 mb-2">
-                  <p className="text-[10px] font-light text-[#636158] tracking-[0.03em] truncate">{ex.prescription}</p>
-                  <span className={`text-[10px] font-medium flex-shrink-0 ${exDone ? 'text-[#22E8E0]' : 'text-[#636158]'}`}>
+                  <p className="text-[10px] font-light text-ink-mid tracking-[0.03em] truncate">{ex.prescription}</p>
+                  <span className={`text-[10px] font-medium flex-shrink-0 ${exDone ? 'text-accent' : 'text-ink-mid'}`}>
                     {exDoneCount}/{ex.sets.length}
                   </span>
                 </div>
@@ -295,40 +296,41 @@ export default function DayWorkout() {
                 <div className="flex flex-col gap-1">
                   {ex.sets.map((set, setIdx) => (
                     <div key={setIdx}
-                      className={`flex items-center gap-1.5 px-2 py-1.5 border-[0.5px] ${set.completed ? 'border-[#22E8E0]/30 bg-[#22E8E0]/8' : 'border-[#E5E3DD] bg-[#F8F7F4]'}`}>
-                      <span className="text-[10px] font-light text-[#636158] w-3 flex-shrink-0">{setIdx + 1}</span>
+                      className={`flex items-center gap-1.5 px-2 py-1.5 border-[0.5px] transition-colors ${set.completed ? 'border-accent/30 bg-accent-bg' : 'border-border bg-bg'}`}>
+                      <span className="text-[10px] font-light text-ink-mid w-3 flex-shrink-0">{setIdx + 1}</span>
                       <div className="flex flex-1 min-w-0 items-center gap-1.5">
                         <div className="flex-1 min-w-0 flex flex-col items-center overflow-hidden">
                           <input
                             type="number" inputMode="numeric" value={set.reps} min={1}
                             onChange={(e) => updateSet(exIdx, setIdx, { reps: Math.max(1, parseInt(e.target.value) || 1) })}
-                            className="w-full min-w-0 text-center text-[16px] font-extralight bg-transparent text-[#0F0F0E] focus:outline-none border-b-[0.5px] border-[#E5E3DD] focus:border-[#22E8E0] pb-0.5"
+                            className="w-full min-w-0 text-center text-[16px] font-extralight bg-transparent text-ink focus:outline-none border-b-[0.5px] border-border focus:border-accent pb-0.5"
                           />
-                          <span className="text-[8px] font-medium text-[#636158] uppercase tracking-[0.12em] mt-0.5">reps</span>
+                          <span className="text-[8px] font-medium text-ink-mid uppercase tracking-[0.12em] mt-0.5">reps</span>
                         </div>
                         <div className="flex-1 min-w-0 flex flex-col items-center overflow-hidden">
                           <input
                             type="number" inputMode="decimal" value={set.weightKg} min={0} step={2.5}
                             onChange={(e) => updateSet(exIdx, setIdx, { weightKg: Math.max(0, parseFloat(e.target.value) || 0) })}
-                            className="w-full min-w-0 text-center text-[16px] font-extralight bg-transparent text-[#0F0F0E] focus:outline-none border-b-[0.5px] border-[#E5E3DD] focus:border-[#22E8E0] pb-0.5"
+                            className="w-full min-w-0 text-center text-[16px] font-extralight bg-transparent text-ink focus:outline-none border-b-[0.5px] border-border focus:border-accent pb-0.5"
                           />
-                          <span className="text-[8px] font-medium text-[#636158] uppercase tracking-[0.12em] mt-0.5">kg</span>
+                          <span className="text-[8px] font-medium text-ink-mid uppercase tracking-[0.12em] mt-0.5">kg</span>
                         </div>
                       </div>
                       <button onClick={() => toggleSet(exIdx, setIdx)}
-                        className={`w-6 h-6 flex items-center justify-center flex-shrink-0 border-[0.5px] ${set.completed ? 'border-[#22E8E0] bg-[#22E8E0] text-[#0F0F0E]' : 'border-[#E5E3DD] text-[#636158]'}`}>
+                        className={`w-6 h-6 flex items-center justify-center flex-shrink-0 border-[0.5px] transition-all duration-150 active:scale-110 ${set.completed ? 'border-accent bg-accent text-white' : 'border-border text-ink-mid'}`}
+                        style={set.completed ? { animation: 'apex-check 0.25s ease-out' } : {}}>
                         <CheckCircle2 size={12} strokeWidth={2} />
                       </button>
                     </div>
                   ))}
                   <div className="flex items-center gap-3 mt-1">
                     <button onClick={() => addSet(exIdx)}
-                      className="text-[9px] font-medium text-[#636158] uppercase tracking-[0.2em] py-0.5">
+                      className="text-[9px] font-medium text-accent uppercase tracking-[0.2em] py-0.5">
                       + set
                     </button>
                     {ex.sets.length > 1 && (
                       <button onClick={() => removeLastSet(exIdx)}
-                        className="text-[9px] font-medium text-[#B5B2AA] uppercase tracking-[0.2em] py-0.5">
+                        className="text-[9px] font-medium text-ink-muted uppercase tracking-[0.2em] py-0.5">
                         − set
                       </button>
                     )}
@@ -343,9 +345,9 @@ export default function DayWorkout() {
       {restActive && <RestTimer key={restKey} onDismiss={() => setRestActive(false)} />}
 
       <div className="fixed left-0 right-0 px-6 pt-8 pointer-events-none"
-        style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))', background: 'linear-gradient(to top, #F8F7F4 75%, transparent)' }}>
+        style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))', background: 'linear-gradient(to top, var(--color-bg) 75%, transparent)' }}>
         <button onClick={finishAndNext} disabled={!allDone || saving}
-          className={`pointer-events-auto w-full py-[18px] t-cta transition-opacity ${allDone ? 'bg-[#22E8E0] text-[#0F0F0E] active:opacity-75' : 'bg-white text-[#636158] cursor-default'}`}>
+          className={`pointer-events-auto w-full py-[18px] t-cta transition-all duration-100 ${allDone ? 'bg-accent text-white active:opacity-80 active:scale-[0.97]' : 'bg-surface text-ink-mid cursor-default border-[0.5px] border-border'}`}>
           {saving ? 'saving…' : allDone ? (nextDay ? 'Finish & Next Day' : 'Finish Workout') : `${completedSets} / ${totalSets} sets`}
         </button>
       </div>

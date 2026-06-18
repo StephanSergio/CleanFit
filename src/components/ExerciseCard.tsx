@@ -36,8 +36,8 @@ export default function ExerciseCard({ exercise, onSelect, onSwap, onRemove, mod
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-[15px] font-light text-[#0F0F0E] truncate">{exercise.name}</p>
-        <span className="inline-block text-[9px] font-medium uppercase tracking-[0.14em] text-[#B5B2AA] border-[0.5px] border-[#E5E3DD] px-2 py-0.5 rounded-[6px] mt-0.5">
+        <p className="text-[15px] font-light text-ink truncate">{exercise.name}</p>
+        <span className="inline-block text-[9px] font-medium uppercase tracking-[0.14em] text-ink-muted border-[0.5px] border-border px-2 py-0.5 rounded-[6px] mt-0.5">
           {exercise.category}
         </span>
       </div>
@@ -47,7 +47,7 @@ export default function ExerciseCard({ exercise, onSelect, onSwap, onRemove, mod
           {onSwap && (
             <button
               onClick={(e) => { e.stopPropagation(); onSwap() }}
-              className="p-2 bg-transparent border-[0.5px] border-[#E5E3DD] text-[#B5B2AA]"
+              className="p-2 bg-transparent border-[0.5px] border-border text-ink-muted"
               aria-label="Swap exercise"
             >
               <Repeat2 size={16} />
@@ -56,7 +56,7 @@ export default function ExerciseCard({ exercise, onSelect, onSwap, onRemove, mod
           {onRemove && (
             <button
               onClick={(e) => { e.stopPropagation(); onRemove() }}
-              className="p-2 bg-transparent border-[0.5px] border-[#22E8E0]/30 text-[#22E8E0]"
+              className="p-2 bg-transparent border-[0.5px] border-border text-ink-muted"
               aria-label="Remove exercise"
             >
               <X size={16} />
