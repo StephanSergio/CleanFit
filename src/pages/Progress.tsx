@@ -47,14 +47,14 @@ export default function Progress() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-[0.5px] border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-bg pb-nav apex-page">
+    <div className="min-h-screen pb-nav apex-page">
       <div className="px-6 pt-14 pb-6">
         <h1 className="text-[44px] font-extralight text-ink lowercase">progress</h1>
       </div>

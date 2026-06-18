@@ -26,7 +26,7 @@ export default function History() {
   const today = new Date().toISOString().split('T')[0]
 
   return (
-    <div className="min-h-screen bg-bg pb-nav apex-page">
+    <div className="min-h-screen pb-nav apex-page">
       <div className="px-6 pt-14 pb-6">
         <h1 className="text-[44px] font-extralight text-ink lowercase">history</h1>
       </div>

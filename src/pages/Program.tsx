@@ -9,14 +9,14 @@ export default function Program() {
 
   if (!program) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <p className="text-[15px] font-light text-ink-muted">Program not found.</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-bg pb-nav apex-page">
+    <div className="min-h-screen pb-nav apex-page">
       {/* Header */}
       <div className="px-6 pt-14 pb-7">
         <button

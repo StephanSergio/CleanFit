@@ -49,7 +49,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-bg pb-nav apex-page">
+    <div className="min-h-screen pb-nav apex-page">
       {/* Header */}
       <div className="flex items-center justify-between px-6 pt-14 pb-4 border-b-[0.5px] border-border">
         <button

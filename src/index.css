@@ -16,6 +16,14 @@
   --color-neutral:     #d0cdc4;
 }
 
+/* Subtle scroll-reactive background gradient. --bg-shift is updated on scroll
+   (JS, rAF) and only drives a transform, so it stays on the compositor. */
+:root {
+  --grad-a: #f5f3ef;
+  --grad-b: #e8e6f4;
+  --bg-shift: 0vh;
+}
+
 /* Dark palette — overrides the theme variables; every semantic utility
    (bg-bg, text-ink, border-border, bg-accent…) picks these up automatically. */
 :root.dark {
@@ -30,6 +38,8 @@
   --color-accent-2:  #818cf8;
   --color-accent-bg: #20203a;
   --color-neutral:   #3a382f;
+  --grad-a: #111110;
+  --grad-b: #17161f;
 }
 
 * {
@@ -43,12 +53,32 @@ html, body, #root {
   max-width: 100vw;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
 body {
   margin: 0;
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   background-color: var(--color-bg);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Fixed gradient layer behind everything. Taller than the viewport and shifted
+   up as you scroll so the tint deepens toward the bottom of a page. */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200vh;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--grad-a) 0%, var(--grad-b) 100%);
+  transform: translate3d(0, var(--bg-shift), 0);
+  will-change: transform;
 }
 
 input[type="number"]::-webkit-inner-spin-button,

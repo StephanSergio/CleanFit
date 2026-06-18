@@ -14,7 +14,7 @@ export default function PhaseDetail() {
 
   if (!program || !phase) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <p className="text-[15px] font-light text-ink-muted">Not found.</p>
       </div>
     )
@@ -74,7 +74,7 @@ export default function PhaseDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-bg pb-nav apex-page">
+    <div className="min-h-screen pb-nav apex-page">
       {/* Sticky header */}
       <div className="sticky top-0 z-10 bg-bg px-6 pt-14 pb-5 border-b-[0.5px] border-border">
         <button

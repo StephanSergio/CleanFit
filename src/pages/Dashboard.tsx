@@ -53,7 +53,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-bg pb-nav apex-page">
+    <div className="min-h-screen pb-nav apex-page">
       {/* Header */}
       <div className="px-6 pt-14 pb-4 flex items-baseline justify-between border-b-[0.5px] border-border">
         <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink">FitLog</span>
