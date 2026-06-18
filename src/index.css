@@ -14,6 +14,7 @@
   --color-accent-2:    #6366f1;
   --color-accent-bg:   #ecebfc;
   --color-neutral:     #d0cdc4;
+  --font-display:      "Space Grotesk", -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
 }
 
 /* Subtle scroll-reactive background gradient. --bg-shift is updated on scroll
@@ -155,9 +156,13 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /* APEX type utilities */
-.t-hero    { font-size: 44px; font-weight: 200; text-transform: lowercase; letter-spacing: 0.01em; line-height: 1.05; }
-.t-title   { font-size: 28px; font-weight: 300; line-height: 1.2; }
+.t-hero    { font-family: var(--font-display); font-size: 44px; font-weight: 400; text-transform: lowercase; letter-spacing: -0.02em; line-height: 1.02; }
+.t-title   { font-family: var(--font-display); font-size: 28px; font-weight: 400; letter-spacing: -0.015em; line-height: 1.15; }
 .t-eyebrow { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.18em; color: var(--color-ink-muted); }
 .t-body    { font-size: 15px; font-weight: 300; line-height: 1.65; letter-spacing: 0.01em; }
-.t-stat    { font-size: 44px; font-weight: 200; letter-spacing: -0.02em; line-height: 1; }
+.t-stat    { font-family: var(--font-display); font-size: 44px; font-weight: 400; letter-spacing: -0.02em; line-height: 1; }
 .t-cta     { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; }
+
+/* Display headline utility — Space Grotesk, for program titles & page heads */
+.font-display { font-family: var(--font-display); }
+.t-mono    { font-feature-settings: "tnum" 1; font-variant-numeric: tabular-nums; }

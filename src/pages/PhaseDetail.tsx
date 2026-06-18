@@ -90,7 +90,7 @@ export default function PhaseDetail() {
             ? `Phase ${phaseIndex} of ${program.phases.length}`
             : 'Weekly Cycle'}
         </p>
-        <h1 className="text-[28px] font-light text-ink lowercase">
+        <h1 className="text-[28px] font-display font-medium text-ink lowercase tracking-[-0.015em]">
           {phase.name}
         </h1>
         <p className="text-[13px] font-light text-ink-mid mt-1">

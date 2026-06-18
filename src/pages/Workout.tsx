@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Plus, Timer } from 'lucide-react'
 import { useWorkout } from '../contexts/WorkoutContext'
 import { useWorkouts } from '../hooks/useWorkouts'
+import { usePresets } from '../contexts/PresetsContext'
 import { useElapsed } from '../hooks/useElapsed'
 import ExerciseCard from '../components/ExerciseCard'
 import SetRow from '../components/SetRow'
@@ -13,6 +14,7 @@ import type { WgerExercise } from '../types'
 export default function Workout() {
   const { workout, dispatch } = useWorkout()
   const { saveWorkout } = useWorkouts()
+  const { getPreset, savePreset } = usePresets()
   const navigate = useNavigate()
   const timer = useElapsed(workout?.startTime)
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -52,6 +54,8 @@ export default function Workout() {
       navigate('/')
       return
     }
+    // Remember per-set weights for each exercise for next time.
+    workout.exercises.forEach((ex) => savePreset(ex.name, ex.sets.map((s) => s.weightKg), ex.sets.map((s) => s.reps)))
     await saveWorkout({
       name: workout.name,
       date: new Date().toISOString().split('T')[0],
@@ -63,9 +67,15 @@ export default function Workout() {
   }
 
   function handleAddExercise(ex: WgerExercise) {
+    // Pre-fill sets from the last time this exercise was done (any program/session).
+    const preset = getPreset(ex.name)
+    const sets = preset && preset.weights.length
+      ? preset.weights.map((w, i) => ({ reps: preset.reps[i] ?? preset.reps[preset.reps.length - 1] ?? 8, weightKg: w, completed: false }))
+      : undefined
     dispatch({
       type: 'ADD_EXERCISE',
       exercise: { exerciseId: String(ex.id), name: ex.name, category: ex.category, imageUrl: ex.imageUrl },
+      sets,
     })
   }
 

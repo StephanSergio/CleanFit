@@ -103,7 +103,7 @@ export default function Steps() {
 
       {/* Header */}
       <div className="px-6 pt-14 pb-6">
-        <h1 className="text-[44px] font-extralight text-ink lowercase">steps</h1>
+        <h1 className="text-[44px] font-display font-light tracking-[-0.02em] text-ink lowercase">steps</h1>
       </div>
 
       {/* Today hero */}

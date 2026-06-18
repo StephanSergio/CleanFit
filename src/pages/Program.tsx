@@ -30,7 +30,7 @@ export default function Program() {
         <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-2">
           training program
         </p>
-        <h1 className="text-[44px] font-extralight lowercase tracking-[0.01em] leading-[1.05] text-ink">
+        <h1 className="text-[44px] font-display font-light tracking-[-0.02em] lowercase tracking-[0.01em] leading-[1.05] text-ink">
           {program.name.toLowerCase()}
         </h1>
         <p className="text-[13px] font-extralight text-ink-mid lowercase mt-2">
@@ -56,7 +56,7 @@ export default function Program() {
               <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-mid mb-1">
                 {program.phases.length > 1 ? `phase ${i + 1}` : 'cycle'}
               </p>
-              <p className="text-[18px] font-light text-ink lowercase leading-snug">
+              <p className="text-[18px] font-display font-medium text-ink lowercase tracking-[-0.01em] leading-snug">
                 {phase.name}
               </p>
               <p className="text-[13px] font-light text-ink-mid mt-0.5">

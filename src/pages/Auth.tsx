@@ -45,10 +45,10 @@ export default function Auth() {
       <div className="flex-1 flex flex-col justify-center">
         {/* Hero heading */}
         <div className="mb-10">
-          <h1 className="text-[44px] font-extralight lowercase tracking-[0.01em] leading-[1.05] text-ink">
+          <h1 className="text-[44px] font-display font-light tracking-[-0.02em] lowercase tracking-[0.01em] leading-[1.05] text-ink">
             {mode === 'signin' ? 'Welcome' : 'Get'}
           </h1>
-          <h1 className="text-[44px] font-extralight lowercase tracking-[0.01em] leading-[1.05] text-ink">
+          <h1 className="text-[44px] font-display font-light tracking-[-0.02em] lowercase tracking-[0.01em] leading-[1.05] text-ink">
             {mode === 'signin' ? 'back.' : 'started.'}
           </h1>
           <p className="text-[14px] font-extralight text-ink-mid lowercase mt-3">

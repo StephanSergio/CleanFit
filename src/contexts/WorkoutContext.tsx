@@ -11,7 +11,7 @@ export interface ActiveWorkout {
 type Action =
   | { type: 'START' }
   | { type: 'START_WITH_EXERCISES'; name: string; exercises: WorkoutExercise[] }
-  | { type: 'ADD_EXERCISE'; exercise: Omit<WorkoutExercise, 'sets'> }
+  | { type: 'ADD_EXERCISE'; exercise: Omit<WorkoutExercise, 'sets'>; sets?: WorkoutSet[] }
   | { type: 'REMOVE_EXERCISE'; index: number }
   | { type: 'SWAP_EXERCISE'; index: number; exercise: Omit<WorkoutExercise, 'sets'> }
   | { type: 'ADD_SET'; exerciseIndex: number }
@@ -44,8 +44,12 @@ function reducer(state: ActiveWorkout | null, action: Action): ActiveWorkout | n
   if (!state) return state
 
   switch (action.type) {
-    case 'ADD_EXERCISE':
-      return { ...state, exercises: [...state.exercises, makeExercise(action.exercise)] }
+    case 'ADD_EXERCISE': {
+      const created = action.sets && action.sets.length
+        ? { ...action.exercise, sets: action.sets.map((s) => ({ ...s, completed: false })) }
+        : makeExercise(action.exercise)
+      return { ...state, exercises: [...state.exercises, created] }
+    }
 
     case 'REMOVE_EXERCISE':
       return { ...state, exercises: state.exercises.filter((_, i) => i !== action.index) }

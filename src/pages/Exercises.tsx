@@ -45,7 +45,7 @@ export default function Exercises() {
     <div className="min-h-screen pb-nav apex-page">
       {/* Sticky header */}
       <div className="sticky top-0 z-10 bg-bg/95 backdrop-blur px-6 pt-14 pb-3">
-        <h1 className="text-[44px] font-extralight text-ink lowercase mb-4">exercises</h1>
+        <h1 className="text-[44px] font-display font-light tracking-[-0.02em] text-ink lowercase mb-4">exercises</h1>
 
         {/* Search */}
         <div className="flex items-center gap-2 border-b-[0.5px] border-border bg-transparent px-0 py-3 mb-4">

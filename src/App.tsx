@@ -4,6 +4,7 @@ import { useAuth } from './hooks/useAuth'
 import { WorkoutProvider } from './contexts/WorkoutContext'
 import { WorkoutsProvider } from './contexts/WorkoutsContext'
 import { StepsProvider } from './contexts/StepsContext'
+import { PresetsProvider } from './contexts/PresetsContext'
 import BottomNav from './components/BottomNav'
 import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
@@ -35,6 +36,7 @@ function ProtectedLayout() {
     <WorkoutsProvider>
     <WorkoutProvider>
     <StepsProvider>
+    <PresetsProvider>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/workout" element={<Workout />} />
@@ -49,6 +51,7 @@ function ProtectedLayout() {
         <Route path="/program/:programId/:phaseId/w/:week/d/:dayNum" element={<DayWorkout />} />
       </Routes>
       <BottomNav />
+    </PresetsProvider>
     </StepsProvider>
     </WorkoutProvider>
     </WorkoutsProvider>

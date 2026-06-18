@@ -14,7 +14,7 @@ export default function Programs() {
         <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-2">
           Training
         </p>
-        <h1 className="text-[44px] font-extralight lowercase tracking-[0.01em] leading-[1.05] text-ink">
+        <h1 className="text-[44px] font-display font-light tracking-[-0.02em] lowercase tracking-[0.01em] leading-[1.05] text-ink">
           programs
         </h1>
       </div>
@@ -37,7 +37,7 @@ export default function Programs() {
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <p className="text-[20px] font-light text-ink lowercase leading-snug">
+                  <p className="text-[20px] font-display font-medium text-ink lowercase tracking-[-0.01em] leading-snug">
                     {p.name}
                   </p>
                   {isActive && (

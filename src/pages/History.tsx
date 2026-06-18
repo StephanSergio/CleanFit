@@ -28,7 +28,7 @@ export default function History() {
   return (
     <div className="min-h-screen pb-nav apex-page">
       <div className="px-6 pt-14 pb-6">
-        <h1 className="text-[44px] font-extralight text-ink lowercase">history</h1>
+        <h1 className="text-[44px] font-display font-light tracking-[-0.02em] text-ink lowercase">history</h1>
       </div>
 
       {/* Calendar card */}

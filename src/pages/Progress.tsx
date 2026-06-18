@@ -56,7 +56,7 @@ export default function Progress() {
   return (
     <div className="min-h-screen pb-nav apex-page">
       <div className="px-6 pt-14 pb-6">
-        <h1 className="text-[44px] font-extralight text-ink lowercase">progress</h1>
+        <h1 className="text-[44px] font-display font-light tracking-[-0.02em] text-ink lowercase">progress</h1>
       </div>
 
       {/* Circle ring */}
@@ -70,7 +70,7 @@ export default function Progress() {
             stroke={12}
           />
           <div className="absolute text-center">
-            <p className="text-[44px] font-extralight text-ink leading-none">{workouts.length}</p>
+            <p className="text-[44px] font-display font-light tracking-[-0.02em] text-ink leading-none">{workouts.length}</p>
             <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mt-1">sessions</p>
           </div>
         </div>

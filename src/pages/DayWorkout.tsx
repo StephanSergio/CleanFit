@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Timer, CheckCircle2, Clock } from 'lucide-react'
+import { ArrowLeft, Timer, CheckCircle2, Clock, Repeat2 } from 'lucide-react'
 import { getProgram } from '../data/programs'
 import { useProgramProgress, useCompletedSessions, getNextSession } from '../hooks/useProgramProgress'
 import { useExerciseImages } from '../hooks/useExerciseImages'
 import { useWorkouts } from '../hooks/useWorkouts'
+import { usePresets, applyPresetWeights } from '../contexts/PresetsContext'
 import RestTimer from '../components/RestTimer'
 import ScrollReveal from '../components/ScrollReveal'
+import ExerciseDrawer from '../components/ExerciseDrawer'
 import { useElapsed } from '../hooks/useElapsed'
-import type { WorkoutSet } from '../types'
+import type { WorkoutSet, WgerExercise } from '../types'
 
 function parseReps(setsCount: number, repsStr: string): WorkoutSet[] {
   const nums = (repsStr.match(/\d+/g) ?? ['10']).map(Number)
@@ -50,9 +52,11 @@ export default function DayWorkout() {
   const { markComplete } = useCompletedSessions()
   const { getImage } = useExerciseImages()
   const { saveWorkout, updateWorkout } = useWorkouts()
+  const { getPreset, savePreset } = usePresets()
   const docIdRef = useRef<string | null>(null)
   const creatingRef = useRef(false)
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const buildKeyRef = useRef('')
 
   const program = getProgram(programId)
   const phase = program?.phases.find((p) => p.id === phaseId)
@@ -66,6 +70,7 @@ export default function DayWorkout() {
   const [restActive, setRestActive] = useState(false)
   const [restKey, setRestKey] = useState(0)
   const [scrolled, setScrolled] = useState(false)
+  const [swapIdx, setSwapIdx] = useState<number | null>(null)
   const timer = useElapsed(startTime)
 
   useEffect(() => {
@@ -81,15 +86,28 @@ export default function DayWorkout() {
       setExercises(stored.exercises)
       docIdRef.current = stored.docId ?? null
       setTracking(true)
+      buildKeyRef.current = storeKey
       return
     }
+    // Fresh build from the program. Rebuilds when weight presets arrive
+    // (Firestore loads async), but never once the user is tracking this day —
+    // so in-progress edits are never clobbered.
+    if (tracking && buildKeyRef.current === storeKey) return
+    buildKeyRef.current = storeKey
     const category = day.focus.split(/[&,]/)[0].trim()
-    setExercises(day.exercises.map((ex) => ({
-      name: ex.name, category, superset: !!ex.superset,
-      prescription: `${ex.sets} sets · ${ex.reps}`,
-      sets: parseReps(ex.sets, ex.reps),
-    })))
-  }, [storeKey, day])
+    setExercises(day.exercises.map((ex) => {
+      const sets = parseReps(ex.sets, ex.reps)
+      // Pre-fill weights from the last time this exercise was done (any program).
+      // Reps stay as the program prescribes; only the loaded weight is remembered.
+      const preset = getPreset(ex.name)
+      const weights = applyPresetWeights(preset, sets.length, sets[0]?.weightKg ?? 10)
+      return {
+        name: ex.name, category, superset: !!ex.superset,
+        prescription: `${ex.sets} sets · ${ex.reps}`,
+        sets: sets.map((s, i) => ({ ...s, weightKg: weights[i] })),
+      }
+    }))
+  }, [storeKey, day, getPreset, tracking])
 
   useEffect(() => {
     if (tracking && exercises.length) saveStored(storeKey, { exercises, docId: docIdRef.current, startTime })
@@ -141,7 +159,28 @@ export default function DayWorkout() {
     }))
   }
 
+  // Swap one exercise for any library exercise — for THIS session only. The
+  // program day is unchanged, so next time you do this day the original returns.
+  function handleSwap(ex: WgerExercise) {
+    if (swapIdx === null) return
+    setExercises((prev) => prev.map((item, i) => {
+      if (i !== swapIdx) return item
+      const preset = getPreset(ex.name)
+      const weights = applyPresetWeights(preset, item.sets.length, 10)
+      return {
+        ...item,
+        name: ex.name,
+        category: ex.category,
+        sets: item.sets.map((s, j) => ({ reps: s.reps, weightKg: weights[j], completed: false })),
+      }
+    }))
+    setSwapIdx(null)
+  }
+
   async function persist(exs: TrackingExercise[]) {
+    // Remember the per-set weights for each exercise so the next session (this or
+    // any other program) pre-fills them. History below is never overwritten.
+    exs.forEach((ex) => savePreset(ex.name, ex.sets.map((s) => s.weightKg), ex.sets.map((s) => s.reps)))
     const payload = {
       name: `${program!.name} · W${week} D${day!.day} — ${day!.focus}`,
       date: new Date().toISOString().split('T')[0],
@@ -280,11 +319,18 @@ export default function DayWorkout() {
                 {ex.superset && (
                   <p className="text-[9px] font-medium text-accent uppercase tracking-[0.2em] mb-0.5">Superset</p>
                 )}
-                <div className="flex items-start gap-1 mb-0.5">
+                <div className="flex items-start gap-1.5 mb-0.5">
                   <p className={`text-[13px] font-light lowercase tracking-[0.01em] leading-tight flex-1 ${exDone ? 'text-ink-mid' : 'text-ink'}`}>
                     {ex.name.toLowerCase()}
                   </p>
                   {exDone && <CheckCircle2 size={14} className="text-accent flex-shrink-0 mt-0.5" />}
+                  <button
+                    onClick={() => setSwapIdx(exIdx)}
+                    className="text-ink-muted active:text-accent flex-shrink-0 mt-0.5 active:scale-90 transition-all duration-100"
+                    aria-label="Swap exercise"
+                  >
+                    <Repeat2 size={14} />
+                  </button>
                 </div>
                 <div className="flex items-center gap-2 mb-2">
                   <p className="text-[10px] font-light text-ink-mid tracking-[0.03em] truncate">{ex.prescription}</p>
@@ -351,6 +397,13 @@ export default function DayWorkout() {
           {saving ? 'saving…' : allDone ? (nextDay ? 'Finish & Next Day' : 'Finish Workout') : `${completedSets} / ${totalSets} sets`}
         </button>
       </div>
+
+      <ExerciseDrawer
+        open={swapIdx !== null}
+        onClose={() => setSwapIdx(null)}
+        onSelect={handleSwap}
+        title="Swap Exercise"
+      />
     </div>
   )
 }
