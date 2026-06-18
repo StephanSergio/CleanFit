@@ -2,6 +2,7 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
 import { WorkoutProvider } from './contexts/WorkoutContext'
 import { WorkoutsProvider } from './contexts/WorkoutsContext'
+import { StepsProvider } from './contexts/StepsContext'
 import BottomNav from './components/BottomNav'
 import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
@@ -10,6 +11,7 @@ import Exercises from './pages/Exercises'
 import History from './pages/History'
 import Progress from './pages/Progress'
 import Programs from './pages/Programs'
+import Steps from './pages/Steps'
 import Profile from './pages/Profile'
 import Program from './pages/Program'
 import PhaseDetail from './pages/PhaseDetail'
@@ -31,6 +33,7 @@ function ProtectedLayout() {
   return (
     <WorkoutsProvider>
     <WorkoutProvider>
+    <StepsProvider>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/workout" element={<Workout />} />
@@ -38,12 +41,14 @@ function ProtectedLayout() {
         <Route path="/history" element={<History />} />
         <Route path="/progress" element={<Progress />} />
         <Route path="/programs" element={<Programs />} />
+        <Route path="/steps" element={<Steps />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/program/:programId" element={<Program />} />
         <Route path="/program/:programId/:phaseId" element={<PhaseDetail />} />
         <Route path="/program/:programId/:phaseId/w/:week/d/:dayNum" element={<DayWorkout />} />
       </Routes>
       <BottomNav />
+    </StepsProvider>
     </WorkoutProvider>
     </WorkoutsProvider>
   )

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, RotateCcw } from 'lucide-react'
+import { X, RotateCcw, Pause, Play } from 'lucide-react'
 
 const PRESETS = [
   { label: '1m', seconds: 60 },
@@ -15,13 +15,12 @@ interface Props {
 export default function RestTimer({ onDismiss }: Props) {
   const [preset, setPreset] = useState(90)
   const [remaining, setRemaining] = useState(90)
+  const [paused, setPaused] = useState(false)
   const onDismissRef = useRef(onDismiss)
   onDismissRef.current = onDismiss
 
-  // One stable interval for the component's lifetime. It decrements via a
-  // functional update and fires onDismiss (through a ref) at zero, so it is
-  // immune to parent re-renders recreating the onDismiss prop.
   useEffect(() => {
+    if (paused) return
     const id = setInterval(() => {
       setRemaining((r) => {
         if (r <= 1) {
@@ -33,15 +32,17 @@ export default function RestTimer({ onDismiss }: Props) {
       })
     }, 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [paused])
 
   function select(seconds: number) {
     setPreset(seconds)
     setRemaining(seconds)
+    setPaused(false)
   }
 
   function reset() {
     setRemaining(preset)
+    setPaused(false)
   }
 
   const pct = Math.max(0, (remaining / preset) * 100)
@@ -83,6 +84,12 @@ export default function RestTimer({ onDismiss }: Props) {
           </div>
 
           <div className="flex gap-1.5 flex-shrink-0">
+            <button
+              onClick={() => setPaused((p) => !p)}
+              className="w-9 h-9 rounded-none bg-transparent border-[0.5px] border-[#2A2A28] flex items-center justify-center text-[#22E8E0]"
+            >
+              {paused ? <Play size={15} /> : <Pause size={15} />}
+            </button>
             <button
               onClick={reset}
               className="w-9 h-9 rounded-none bg-transparent border-[0.5px] border-[#2A2A28] flex items-center justify-center text-[#636158]"
