@@ -1,16 +1,35 @@
 @import "tailwindcss";
 
+/* Class-based dark mode: `dark:` variants apply when <html> has .dark */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --color-bg:          #F8F7F4;
-  --color-bg-dark:     #111110;
-  --color-surface:     #FFFFFF;
-  --color-surface-dark:#1C1C1A;
-  --color-ink:         #0F0F0E;
+  --color-bg:          #f5f3ef;
+  --color-surface:     #faf9f6;
+  --color-ink:         #1a1a1a;
   --color-ink-mid:     #636158;
   --color-ink-muted:   #B5B2AA;
-  --color-border:      #E5E3DD;
-  --color-border-dark: #2A2A28;
-  --color-accent:      #22E8E0;
+  --color-border:      #e3e0d9;
+  --color-accent:      #4f46e5;
+  --color-accent-2:    #6366f1;
+  --color-accent-bg:   #ecebfc;
+  --color-neutral:     #d0cdc4;
+}
+
+/* Dark palette — overrides the theme variables; every semantic utility
+   (bg-bg, text-ink, border-border, bg-accent…) picks these up automatically. */
+:root.dark {
+  color-scheme: dark;
+  --color-bg:        #111110;
+  --color-surface:   #1b1b18;
+  --color-ink:       #f3f1ec;
+  --color-ink-mid:   #a8a49a;
+  --color-ink-muted: #6f6c63;
+  --color-border:    #2a2a26;
+  --color-accent:    #6366f1;
+  --color-accent-2:  #818cf8;
+  --color-accent-bg: #20203a;
+  --color-neutral:   #3a382f;
 }
 
 * {
@@ -27,8 +46,8 @@ html, body, #root {
 body {
   margin: 0;
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
-  background-color: #F8F7F4;
-  color: #0F0F0E;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -56,49 +75,59 @@ input[type="number"]::-webkit-outer-spin-button {
   to   { opacity: 1; }
 }
 @keyframes apex-check {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.25); }
+  0%   { transform: scale(0.8); }
+  55%  { transform: scale(1.15); }
+  80%  { transform: scale(0.95); }
   100% { transform: scale(1); }
 }
 @keyframes apex-slide-up {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.apex-page {
-  animation: apex-enter 320ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+@media (prefers-reduced-motion: no-preference) {
+  .apex-page {
+    animation: apex-enter 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+  .apex-page-fast {
+    animation: apex-enter 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+  .apex-fade {
+    animation: apex-fade 200ms ease-out both;
+  }
+  .apex-stagger > *:nth-child(1)  { animation: apex-slide-up 250ms 0ms   cubic-bezier(0.25,0.46,0.45,0.94) both; }
+  .apex-stagger > *:nth-child(2)  { animation: apex-slide-up 250ms 30ms  cubic-bezier(0.25,0.46,0.45,0.94) both; }
+  .apex-stagger > *:nth-child(3)  { animation: apex-slide-up 250ms 60ms  cubic-bezier(0.25,0.46,0.45,0.94) both; }
+  .apex-stagger > *:nth-child(4)  { animation: apex-slide-up 250ms 90ms  cubic-bezier(0.25,0.46,0.45,0.94) both; }
+  .apex-stagger > *:nth-child(5)  { animation: apex-slide-up 250ms 120ms cubic-bezier(0.25,0.46,0.45,0.94) both; }
+  .apex-stagger > *:nth-child(6)  { animation: apex-slide-up 250ms 150ms cubic-bezier(0.25,0.46,0.45,0.94) both; }
+  .apex-stagger > *:nth-child(n+7){ animation: apex-slide-up 250ms 180ms cubic-bezier(0.25,0.46,0.45,0.94) both; }
 }
-.apex-page-fast {
-  animation: apex-enter 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-}
-.apex-fade {
-  animation: apex-fade 250ms ease both;
-}
-/* Staggered card children — add to parent */
-.apex-stagger > *:nth-child(1)  { animation: apex-slide-up 280ms 0ms   cubic-bezier(0.25,0.46,0.45,0.94) both; }
-.apex-stagger > *:nth-child(2)  { animation: apex-slide-up 280ms 40ms  cubic-bezier(0.25,0.46,0.45,0.94) both; }
-.apex-stagger > *:nth-child(3)  { animation: apex-slide-up 280ms 80ms  cubic-bezier(0.25,0.46,0.45,0.94) both; }
-.apex-stagger > *:nth-child(4)  { animation: apex-slide-up 280ms 120ms cubic-bezier(0.25,0.46,0.45,0.94) both; }
-.apex-stagger > *:nth-child(5)  { animation: apex-slide-up 280ms 160ms cubic-bezier(0.25,0.46,0.45,0.94) both; }
-.apex-stagger > *:nth-child(6)  { animation: apex-slide-up 280ms 200ms cubic-bezier(0.25,0.46,0.45,0.94) both; }
-.apex-stagger > *:nth-child(n+7){ animation: apex-slide-up 280ms 240ms cubic-bezier(0.25,0.46,0.45,0.94) both; }
 
 /* Scroll reveal — elements start hidden, revealed by IntersectionObserver */
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              transform 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform: translateY(8px);
+  transition: opacity 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 .scroll-reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 /* APEX type utilities */
 .t-hero    { font-size: 44px; font-weight: 200; text-transform: lowercase; letter-spacing: 0.01em; line-height: 1.05; }
 .t-title   { font-size: 28px; font-weight: 300; line-height: 1.2; }
-.t-eyebrow { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.18em; color: #B5B2AA; }
+.t-eyebrow { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.18em; color: var(--color-ink-muted); }
 .t-body    { font-size: 15px; font-weight: 300; line-height: 1.65; letter-spacing: 0.01em; }
 .t-stat    { font-size: 44px; font-weight: 200; letter-spacing: -0.02em; line-height: 1; }
 .t-cta     { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; }

@@ -8,17 +8,6 @@ import { PROGRAMS, getProgram } from '../data/programs'
 const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const SCHEDULE_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 
-function focusColor(focus: string): string {
-  const f = focus.toLowerCase()
-  if (f.includes('leg') || f.includes('lower') || f.includes('calf') || f.includes('glute') || f.includes('quad')) return '#4CD964'
-  if (f.includes('chest') || f.includes('push')) return '#FF6B6B'
-  if (f.includes('back') || f.includes('pull') || f.includes('deadlift')) return '#22E8E0'
-  if (f.includes('arm') || f.includes('bicep') || f.includes('tricep')) return '#AF7AE3'
-  if (f.includes('shoulder') || f.includes('delt')) return '#F5A623'
-  if (f.includes('upper') || f.includes('full') || f.includes('super')) return '#FF9500'
-  return '#636158'
-}
-
 export default function Dashboard() {
   const { user } = useAuth()
   const { workouts } = useWorkouts()
@@ -64,77 +53,78 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] pb-nav apex-page">
+    <div className="min-h-screen bg-bg pb-nav apex-page">
       {/* Header */}
-      <div className="px-6 pt-14 pb-4 flex items-baseline justify-between border-b-[0.5px] border-[#E5E3DD]">
-        <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#0F0F0E]">FitLog</span>
-        <span className="text-[11px] font-light text-[#B5B2AA] capitalize">{name}</span>
+      <div className="px-6 pt-14 pb-4 flex items-baseline justify-between border-b-[0.5px] border-border">
+        <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink">FitLog</span>
+        <span className="text-[11px] font-light text-ink-muted capitalize">{name}</span>
       </div>
 
-      {/* Program — all on cream, no dark block */}
-      <div className="px-6 pt-8 pb-6 border-b-[0.5px] border-[#E5E3DD]">
-        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] mb-3">Current Program</p>
-        <h1 className="text-[44px] font-extralight text-[#0F0F0E] lowercase tracking-[0.01em] leading-[1.05]">
+      {/* Program */}
+      <div className="px-6 pt-8 pb-6 border-b-[0.5px] border-border">
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-3">Current Program</p>
+        <h1 className="text-[44px] font-extralight text-ink lowercase tracking-[0.01em] leading-[1.05]">
           {activeProgram.name.toLowerCase()}
         </h1>
         {activeProgram.fullName && activeProgram.fullName !== activeProgram.name && (
-          <p className="text-[13px] font-extralight text-[#636158] lowercase mt-1">{activeProgram.fullName.toLowerCase()}</p>
+          <p className="text-[13px] font-extralight text-ink-mid lowercase mt-1">{activeProgram.fullName.toLowerCase()}</p>
         )}
 
-        {/* 1px orange progress bar — the single accent moment */}
+        {/* indigo progress bar */}
         <div className="mt-5">
-          <div className="h-[1px] bg-[#E5E3DD] relative overflow-hidden">
+          <div className="h-[1px] bg-border relative overflow-hidden">
             <div
-              className="absolute top-0 left-0 h-[1px] bg-[#22E8E0]"
+              className="absolute top-0 left-0 h-[1px] bg-accent"
               style={{ width: `${pct ?? 0}%`, transition: 'width 0.8s cubic-bezier(0.25,0.46,0.45,0.94)' }}
             />
           </div>
           <div className="flex justify-between mt-2">
-            <span className="text-[10px] font-light text-[#B5B2AA] tracking-[0.05em]">{done} sessions</span>
+            <span className="text-[10px] font-light text-ink-muted tracking-[0.05em]">{done} sessions</span>
             {pct !== null
-              ? <span className="text-[10px] font-medium text-[#636158] tracking-[0.05em]">{pct}%</span>
-              : <span className="text-[10px] font-light text-[#B5B2AA]">ongoing</span>}
+              ? <span className="text-[10px] font-medium text-ink-mid tracking-[0.05em]">{pct}%</span>
+              : <span className="text-[10px] font-light text-ink-muted">ongoing</span>}
           </div>
         </div>
       </div>
 
       {/* This week */}
-      <div className="px-6 pt-6 pb-2 border-b-[0.5px] border-[#E5E3DD]">
-        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] mb-3">This Week</p>
+      <div className="px-6 pt-6 pb-2 border-b-[0.5px] border-border">
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-3">This Week</p>
         <div className="apex-stagger">
         {weekRows.map((row, i) => {
           const isDone = row.dayNum !== null && phase
             ? isComplete(activeProgram.id, phase.id, curWeek, row.dayNum)
             : false
           const isToday = row.dayIndex === todayIndex
-          const color = row.isRest ? '#B5B2AA' : focusColor(row.focus)
 
           return (
             <button
               key={i}
               onClick={() => !row.isRest && row.dayNum && phase && navigate(`/program/${activeProgram.id}/${phase.id}/w/${curWeek}/d/${row.dayNum}`)}
               disabled={row.isRest}
-              className={`w-full flex items-center py-3.5 border-b-[0.5px] border-[#E5E3DD] last:border-b-0 text-left transition-opacity ${row.isRest ? 'cursor-default' : ''}`}
-              style={isToday && !isDone ? { background: 'rgba(34,232,224,0.04)' } : {}}
+              className={`w-full flex items-center py-3 border-b-[0.5px] border-border last:border-b-0 text-left active:scale-[0.97] transition-transform duration-100 ${row.isRest ? 'cursor-default' : ''}`}
+              style={isToday && !isDone
+                ? { borderLeft: '3px solid var(--color-accent)', paddingLeft: 12, background: 'var(--color-accent-bg)' }
+                : { paddingLeft: 16 }}
             >
-              <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#B5B2AA] w-10 flex-shrink-0">
+              <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-ink-muted w-10 flex-shrink-0">
                 {row.dayLabel}
               </span>
-              {/* Focus color dot */}
+              {/* Single indigo dot for all non-rest days */}
               {!row.isRest && (
                 <span
                   className="w-1.5 h-1.5 rounded-full flex-shrink-0 mr-2.5"
-                  style={{ background: color, opacity: isDone ? 0.4 : 1 }}
+                  style={{ background: 'var(--color-accent)', opacity: isDone ? 0.3 : 1 }}
                 />
               )}
               <span className={`flex-1 text-[15px] font-light lowercase tracking-[0.01em] ${
-                isDone ? 'text-[#B5B2AA]' : row.isRest ? 'text-[#B5B2AA]' : 'text-[#0F0F0E]'
+                isDone ? 'text-ink-muted' : row.isRest ? 'text-ink-muted' : 'text-ink'
               }`}>
                 {row.focus.toLowerCase()}
               </span>
               <span
                 className="text-[13px] flex-shrink-0 w-4 text-right"
-                style={{ color: isDone ? color : isToday && !row.isRest ? '#22E8E0' : '#B5B2AA' }}
+                style={{ color: isDone ? 'var(--color-accent)' : isToday && !row.isRest ? 'var(--color-accent)' : 'var(--color-ink-muted)' }}
               >
                 {isDone ? '✓' : isToday && !row.isRest ? '·' : row.isRest ? '–' : '○'}
               </span>
@@ -148,7 +138,7 @@ export default function Dashboard() {
       <div className="px-6 pt-6 pb-3">
         <button
           onClick={startToday}
-          className="w-full bg-[#22E8E0] text-[#0F0F0E] py-[18px] t-cta active:opacity-75 transition-opacity active:scale-[0.97] transition-transform duration-150"
+          className="w-full bg-accent text-white py-[18px] t-cta active:opacity-80 active:scale-[0.97] transition-all duration-100"
         >
           Start Today's Workout
         </button>
@@ -156,30 +146,30 @@ export default function Dashboard() {
 
       {/* Secondary actions */}
       <div className="px-6 pb-6 flex items-center gap-6">
-        <button onClick={() => navigate('/history')} className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] active:text-[#636158]">
+        <button onClick={() => navigate('/history')} className="text-[11px] font-medium uppercase tracking-[0.18em] text-ink-muted active:text-ink-mid">
           History
         </button>
-        <span className="text-[#E5E3DD]">·</span>
-        <button onClick={() => navigate('/progress')} className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] active:text-[#636158]">
+        <span className="text-border">·</span>
+        <button onClick={() => navigate('/progress')} className="text-[11px] font-medium uppercase tracking-[0.18em] text-ink-muted active:text-ink-mid">
           Progress
         </button>
-        <span className="text-[#E5E3DD]">·</span>
-        <button onClick={startFreeSession} className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] active:text-[#636158]">
+        <span className="text-border">·</span>
+        <button onClick={startFreeSession} className="text-[11px] font-medium uppercase tracking-[0.18em] text-ink-muted active:text-ink-mid">
           Free Session
         </button>
       </div>
 
-      {/* Recent — minimal */}
+      {/* Recent */}
       {workouts.length > 0 && (
-        <div className="px-6 pt-2 border-t-[0.5px] border-[#E5E3DD]">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B5B2AA] pt-6 mb-3">Recent</p>
+        <div className="px-6 pt-2 border-t-[0.5px] border-border">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted pt-6 mb-3">Recent</p>
           {workouts.slice(0, 4).map((w) => (
-            <div key={w.id} className="flex items-center py-3.5 border-b-[0.5px] border-[#E5E3DD] last:border-b-0">
-              <span className="text-[11px] font-light text-[#B5B2AA] w-12 flex-shrink-0">
+            <div key={w.id} className="flex items-center py-3.5 border-b-[0.5px] border-border last:border-b-0">
+              <span className="text-[11px] font-light text-ink-muted w-12 flex-shrink-0">
                 {new Date(w.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
               </span>
-              <span className="flex-1 text-[14px] font-light text-[#0F0F0E] lowercase truncate px-4">{w.name.toLowerCase()}</span>
-              {w.durationMinutes && <span className="text-[11px] font-light text-[#B5B2AA] flex-shrink-0">{w.durationMinutes}m</span>}
+              <span className="flex-1 text-[14px] font-light text-ink lowercase truncate px-4">{w.name.toLowerCase()}</span>
+              {w.durationMinutes && <span className="text-[11px] font-light text-ink-muted flex-shrink-0">{w.durationMinutes}m</span>}
             </div>
           ))}
         </div>

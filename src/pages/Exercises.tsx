@@ -42,24 +42,24 @@ export default function Exercises() {
   )
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] pb-nav apex-page">
+    <div className="min-h-screen bg-bg pb-nav apex-page">
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 bg-[#F8F7F4]/95 backdrop-blur px-6 pt-14 pb-3">
-        <h1 className="text-[44px] font-extralight text-[#0F0F0E] lowercase mb-4">exercises</h1>
+      <div className="sticky top-0 z-10 bg-bg/95 backdrop-blur px-6 pt-14 pb-3">
+        <h1 className="text-[44px] font-extralight text-ink lowercase mb-4">exercises</h1>
 
-        {/* Search — underline style */}
-        <div className="flex items-center gap-2 border-b-[0.5px] border-[#E5E3DD] bg-transparent px-0 py-3 mb-4">
-          <Search size={15} className="text-[#B5B2AA] flex-shrink-0" />
+        {/* Search */}
+        <div className="flex items-center gap-2 border-b-[0.5px] border-border bg-transparent px-0 py-3 mb-4">
+          <Search size={15} className="text-ink-muted flex-shrink-0" />
           <input
             type="text"
             placeholder="Search exercises…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 bg-transparent text-[15px] font-light text-[#0F0F0E] placeholder-[#B5B2AA] focus:outline-none"
+            className="flex-1 bg-transparent text-[15px] font-light text-ink placeholder-ink-muted focus:outline-none"
           />
-          {(searching || loading) && <Loader2 size={14} className="animate-spin text-[#B5B2AA]" />}
+          {(searching || loading) && <Loader2 size={14} className="animate-spin text-ink-muted" />}
           {query && !searching && (
-            <button onClick={() => setQuery('')} className="text-[#B5B2AA]">
+            <button onClick={() => setQuery('')} className="text-ink-muted">
               <X size={14} />
             </button>
           )}
@@ -73,8 +73,8 @@ export default function Exercises() {
               onClick={() => setCategory(cat)}
               className={`flex-shrink-0 text-[10px] font-medium uppercase tracking-[0.14em] px-3 py-1.5 rounded-[6px] transition-colors ${
                 category === cat
-                  ? 'bg-[#0F0F0E] text-white'
-                  : 'border-[0.5px] border-[#E5E3DD] text-[#B5B2AA] bg-transparent'
+                  ? 'bg-accent text-white'
+                  : 'border-[0.5px] border-border text-ink-muted bg-transparent'
               }`}
             >
               {cat}
@@ -87,16 +87,16 @@ export default function Exercises() {
         {loading ? (
           <div className="flex flex-col gap-[0.5px]">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-[#E5E3DD] animate-pulse h-12 rounded-none" />
+              <div key={i} className="bg-border animate-pulse h-12 rounded-none" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <p className="text-center text-[#B5B2AA] text-[13px] font-light lowercase py-12">no exercises found</p>
+          <p className="text-center text-ink-muted text-[13px] font-light lowercase py-12">no exercises found</p>
         ) : (
           <div>
             {filtered.map((ex, i) => (
               <ScrollReveal key={ex.id} delay={Math.min(i, 6) * 30}>
-                <div className={`py-3.5 ${i < filtered.length - 1 ? 'border-b-[0.5px] border-[#E5E3DD]' : ''}`}>
+                <div className={`py-3.5 ${i < filtered.length - 1 ? 'border-b-[0.5px] border-border' : ''}`}>
                   <ExerciseCard exercise={ex} mode="library" />
                 </div>
               </ScrollReveal>

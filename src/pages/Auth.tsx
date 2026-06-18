@@ -36,22 +36,22 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] flex flex-col px-6 apex-page">
+    <div className="min-h-screen bg-bg flex flex-col px-6 apex-page">
       {/* Brand label */}
-      <p className="pt-14 text-[11px] font-medium uppercase tracking-[0.2em] text-[#0F0F0E]">
+      <p className="pt-14 text-[11px] font-medium uppercase tracking-[0.2em] text-ink">
         FITLOG
       </p>
 
       <div className="flex-1 flex flex-col justify-center">
         {/* Hero heading */}
         <div className="mb-10">
-          <h1 className="text-[44px] font-extralight lowercase tracking-[0.01em] leading-[1.05] text-[#0F0F0E]">
+          <h1 className="text-[44px] font-extralight lowercase tracking-[0.01em] leading-[1.05] text-ink">
             {mode === 'signin' ? 'Welcome' : 'Get'}
           </h1>
-          <h1 className="text-[44px] font-extralight lowercase tracking-[0.01em] leading-[1.05] text-[#0F0F0E]">
+          <h1 className="text-[44px] font-extralight lowercase tracking-[0.01em] leading-[1.05] text-ink">
             {mode === 'signin' ? 'back.' : 'started.'}
           </h1>
-          <p className="text-[14px] font-extralight text-[#636158] lowercase mt-3">
+          <p className="text-[14px] font-extralight text-ink-mid lowercase mt-3">
             track every rep. see every gain.
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function Auth() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full bg-transparent border-b-[0.5px] border-[#E5E3DD] rounded-none px-0 py-3 text-[15px] font-light text-[#0F0F0E] placeholder-[#B5B2AA] focus:outline-none focus:border-[#0F0F0E] transition-colors"
+            className="w-full bg-transparent border-b-[0.5px] border-border rounded-none px-0 py-3 text-[15px] font-light text-ink placeholder-ink-muted focus:outline-none focus:border-accent transition-colors"
           />
           <input
             type="password"
@@ -73,15 +73,15 @@ export default function Auth() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full bg-transparent border-b-[0.5px] border-[#E5E3DD] rounded-none px-0 py-3 text-[15px] font-light text-[#0F0F0E] placeholder-[#B5B2AA] focus:outline-none focus:border-[#0F0F0E] transition-colors"
+            className="w-full bg-transparent border-b-[0.5px] border-border rounded-none px-0 py-3 text-[15px] font-light text-ink placeholder-ink-muted focus:outline-none focus:border-accent transition-colors"
           />
           {error && (
-            <p className="text-[12px] font-light text-[#22E8E0]">{error}</p>
+            <p className="text-[12px] font-light text-ink-mid">{error}</p>
           )}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#22E8E0] text-[#0F0F0E] rounded-none py-[18px] text-[11px] font-medium uppercase tracking-[0.2em] mt-1 disabled:opacity-50 transition-opacity"
+            className="w-full bg-accent text-white rounded-none py-[18px] text-[11px] font-medium uppercase tracking-[0.2em] mt-1 disabled:opacity-50 transition-opacity active:opacity-80 active:scale-[0.97] transition-transform duration-100"
           >
             {loading ? 'Loading…' : mode === 'signin' ? 'Sign In' : 'Create Account'}
           </button>
@@ -89,15 +89,15 @@ export default function Auth() {
 
         {/* "or" divider */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="flex-1 border-b-[0.5px] border-[#E5E3DD]" />
-          <span className="text-[11px] text-[#B5B2AA]">or</span>
-          <div className="flex-1 border-b-[0.5px] border-[#E5E3DD]" />
+          <div className="flex-1 border-b-[0.5px] border-border" />
+          <span className="text-[11px] text-ink-muted">or</span>
+          <div className="flex-1 border-b-[0.5px] border-border" />
         </div>
 
         {/* Google button */}
         <button
           onClick={handleGoogle}
-          className="w-full flex items-center justify-center gap-3 border-[0.5px] border-[#E5E3DD] rounded-none py-[18px] text-[11px] font-medium uppercase tracking-[0.2em] text-[#0F0F0E] transition-opacity active:opacity-70"
+          className="w-full flex items-center justify-center gap-3 border-[0.5px] border-border rounded-none py-[18px] text-[11px] font-medium uppercase tracking-[0.2em] text-ink transition-opacity active:opacity-70"
         >
           <svg width="16" height="16" viewBox="0 0 18 18">
             <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
@@ -113,10 +113,10 @@ export default function Auth() {
       <div className="pb-10 text-center">
         <button
           onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError('') }}
-          className="text-[13px] font-light text-[#B5B2AA]"
+          className="text-[13px] font-light text-ink-muted"
         >
           {mode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
-          <span className="font-medium text-[#0F0F0E]">{mode === 'signin' ? 'Create one' : 'Sign in'}</span>
+          <span className="font-medium text-ink">{mode === 'signin' ? 'Create one' : 'Sign in'}</span>
         </button>
       </div>
     </div>

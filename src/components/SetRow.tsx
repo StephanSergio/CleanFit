@@ -13,7 +13,7 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
     <div
       className={`flex items-center gap-2 px-2.5 py-2 transition-colors ${
         set.completed
-          ? 'bg-[#22E8E0]/5 border-[0.5px] border-[#22E8E0]/30'
+          ? 'bg-accent/5 border-[0.5px] border-accent/30'
           : 'bg-[#1C1C1A] border-[0.5px] border-[#2A2A28]'
       }`}
     >
@@ -27,7 +27,7 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
           <button
             type="button"
             onClick={() => onChange({ reps: Math.max(1, set.reps - 1) })}
-            className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-[#636158] flex-shrink-0"
+            className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid flex-shrink-0"
           >
             <Minus size={13} strokeWidth={2} />
           </button>
@@ -38,14 +38,14 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
               value={set.reps}
               min={1}
               onChange={(e) => onChange({ reps: Math.max(1, parseInt(e.target.value) || 1) })}
-              className="w-10 text-center text-[16px] font-extralight bg-transparent text-white focus:outline-none border-b-[0.5px] border-[#2A2A28] focus:border-[#22E8E0] py-0.5"
+              className="w-10 text-center text-[16px] font-extralight bg-transparent text-white focus:outline-none border-b-[0.5px] border-[#2A2A28] focus:border-accent py-0.5"
             />
             <span className="text-[9px] font-medium uppercase tracking-[0.14em] text-[#4A4844] mt-1">reps</span>
           </div>
           <button
             type="button"
             onClick={() => onChange({ reps: set.reps + 1 })}
-            className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-[#636158] flex-shrink-0"
+            className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid flex-shrink-0"
           >
             <Plus size={13} strokeWidth={2} />
           </button>
@@ -60,7 +60,7 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
           <button
             type="button"
             onClick={() => onChange({ weightKg: Math.max(0, set.weightKg - 2.5) })}
-            className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-[#636158] flex-shrink-0"
+            className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid flex-shrink-0"
           >
             <Minus size={13} strokeWidth={2} />
           </button>
@@ -72,14 +72,14 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
               min={0}
               step={2.5}
               onChange={(e) => onChange({ weightKg: Math.max(0, parseFloat(e.target.value) || 0) })}
-              className="w-12 text-center text-[16px] font-extralight bg-transparent text-white focus:outline-none border-b-[0.5px] border-[#2A2A28] focus:border-[#22E8E0] py-0.5"
+              className="w-12 text-center text-[16px] font-extralight bg-transparent text-white focus:outline-none border-b-[0.5px] border-[#2A2A28] focus:border-accent py-0.5"
             />
             <span className="text-[9px] font-medium uppercase tracking-[0.14em] text-[#4A4844] mt-1">kg</span>
           </div>
           <button
             type="button"
             onClick={() => onChange({ weightKg: set.weightKg + 2.5 })}
-            className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-[#636158] flex-shrink-0"
+            className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid flex-shrink-0"
           >
             <Plus size={13} strokeWidth={2} />
           </button>
@@ -88,11 +88,12 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
 
       <button
         onClick={onToggle}
-        className={`w-7 h-7 border-[0.5px] flex items-center justify-center transition-colors flex-shrink-0 transition-all duration-150 active:scale-110 ${
+        className={`w-7 h-7 border-[0.5px] flex items-center justify-center flex-shrink-0 active:scale-110 transition-all duration-150 ${
           set.completed
-            ? 'border-[#22E8E0] bg-[#22E8E0] text-[#0F0F0E]'
+            ? 'border-accent bg-accent text-white'
             : 'border-[#2A2A28] bg-transparent text-[#4A4844]'
         }`}
+        style={set.completed ? { animation: 'apex-check 0.25s ease-out' } : {}}
       >
         <Check size={14} strokeWidth={2} />
       </button>

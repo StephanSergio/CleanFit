@@ -54,8 +54,8 @@ export default function RestTimer({ onDismiss }: Props) {
       <div className="bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] overflow-hidden">
         <div className="h-[1px] bg-[#2A2A28]">
           <div
-            className="h-[1px] bg-[#22E8E0] transition-all duration-1000 linear"
-            style={{ width: `${pct}%` }}
+            className="h-[1px] bg-accent transition-all ease-linear"
+            style={{ width: `${pct}%`, transitionDuration: '1s' }}
           />
         </div>
 
@@ -74,8 +74,8 @@ export default function RestTimer({ onDismiss }: Props) {
                 onClick={() => select(p.seconds)}
                 className={`text-[10px] font-medium uppercase tracking-[0.14em] px-3 py-1.5 rounded-none transition-colors ${
                   preset === p.seconds
-                    ? 'bg-[#22E8E0] text-[#0F0F0E]'
-                    : 'bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] text-[#636158]'
+                    ? 'bg-accent text-white'
+                    : 'bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] text-ink-mid'
                 }`}
               >
                 {p.label}
@@ -86,19 +86,19 @@ export default function RestTimer({ onDismiss }: Props) {
           <div className="flex gap-1.5 flex-shrink-0">
             <button
               onClick={() => setPaused((p) => !p)}
-              className="w-9 h-9 rounded-none bg-transparent border-[0.5px] border-[#2A2A28] flex items-center justify-center text-[#22E8E0]"
+              className="w-9 h-9 rounded-none bg-transparent border-[0.5px] border-[#2A2A28] flex items-center justify-center text-accent"
             >
               {paused ? <Play size={15} /> : <Pause size={15} />}
             </button>
             <button
               onClick={reset}
-              className="w-9 h-9 rounded-none bg-transparent border-[0.5px] border-[#2A2A28] flex items-center justify-center text-[#636158]"
+              className="w-9 h-9 rounded-none bg-transparent border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid"
             >
               <RotateCcw size={15} />
             </button>
             <button
               onClick={onDismiss}
-              className="w-9 h-9 rounded-none bg-transparent border-[0.5px] border-[#2A2A28] flex items-center justify-center text-[#636158]"
+              className="w-9 h-9 rounded-none bg-transparent border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid"
             >
               <X size={15} />
             </button>
