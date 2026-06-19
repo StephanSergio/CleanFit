@@ -2,20 +2,20 @@
   "name": "FitLog",
   "short_name": "FitLog",
   "description": "Track your workouts and progress",
-  "start_url": "/fitnessapp/",
+  "start_url": "/CleanFit/",
   "display": "standalone",
   "background_color": "#F5F5F7",
   "theme_color": "#F5F5F7",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/fitnessapp/icon-192.png",
+      "src": "/CleanFit/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/fitnessapp/icon-512.png",
+      "src": "/CleanFit/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
