@@ -28,16 +28,29 @@ export default function BottomNav() {
             key={to}
             to={to}
             end={!!end}
+            viewTransition
             className="flex-1 flex flex-col items-center justify-center gap-1 active:scale-[0.97] transition-transform duration-100"
             aria-label={label}
           >
             {({ isActive }) => (
               <>
-                <div className={`flex items-center justify-center w-10 h-10 ${isActive ? 'text-accent' : 'text-ink-muted'}`}>
-                  <Icon size={20} strokeWidth={isActive ? 2 : 1.5} />
+                <div className="relative flex items-center justify-center w-10 h-10">
+                  <span
+                    className="absolute top-0 h-[2.5px] bg-accent transition-all duration-300 ease-out"
+                    style={{ width: isActive ? 22 : 0, opacity: isActive ? 1 : 0 }}
+                  />
+                  <div
+                    className={`transition-all duration-300 ${isActive ? 'text-accent' : 'text-ink-muted'}`}
+                    style={{
+                      transform: isActive ? 'scale(1.2) translateY(1px)' : 'scale(1)',
+                      transitionTimingFunction: isActive ? 'cubic-bezier(0.34,1.56,0.64,1)' : 'ease-out',
+                    }}
+                  >
+                    <Icon size={20} strokeWidth={isActive ? 2.25 : 1.5} />
+                  </div>
                 </div>
                 <span
-                  className={`text-[9px] font-medium uppercase tracking-[0.1em] ${isActive ? 'text-accent' : 'text-ink-muted'}`}
+                  className={`text-[9px] font-medium uppercase tracking-[0.1em] transition-colors duration-300 ${isActive ? 'text-accent' : 'text-ink-muted'}`}
                 >
                   {label}
                 </span>
@@ -47,7 +60,7 @@ export default function BottomNav() {
         ))}
 
         {/* Profile */}
-        <NavLink to="/profile" className="flex-1 flex flex-col items-center justify-center gap-1 active:scale-[0.97] transition-transform duration-100" aria-label="Profile">
+        <NavLink to="/profile" viewTransition className="flex-1 flex flex-col items-center justify-center gap-1 active:scale-[0.97] transition-transform duration-100" aria-label="Profile">
           {({ isActive }) => (
             <>
               <div

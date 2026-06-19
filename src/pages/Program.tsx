@@ -1,10 +1,11 @@
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { useVTNavigate } from '../hooks/useVTNavigate'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { getProgram } from '../data/programs'
 
 export default function Program() {
   const { programId } = useParams()
-  const navigate = useNavigate()
+  const navigate = useVTNavigate()
   const program = getProgram(programId)
 
   if (!program) {

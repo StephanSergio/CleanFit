@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useVTNavigate } from '../hooks/useVTNavigate'
 import { useAuth } from '../hooks/useAuth'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { useProgramProgress, useCompletedSessions } from '../hooks/useProgramProgress'
@@ -14,7 +14,7 @@ export default function Profile() {
   const { progress } = useProgramProgress()
   const { completedCount } = useCompletedSessions()
   const { theme, setTheme } = useTheme()
-  const navigate = useNavigate()
+  const navigate = useVTNavigate()
 
   const [displayName, setDisplayName] = useState(user?.displayName ?? '')
   const [saving, setSaving] = useState(false)

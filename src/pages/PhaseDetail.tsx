@@ -1,4 +1,5 @@
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { useVTNavigate } from '../hooks/useVTNavigate'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { getProgram } from '../data/programs'
 import { useCompletedSessions } from '../hooks/useProgramProgress'
@@ -8,7 +9,7 @@ import type { ProgramDay } from '../data/buffDudes'
 
 export default function PhaseDetail() {
   const { programId, phaseId } = useParams()
-  const navigate = useNavigate()
+  const navigate = useVTNavigate()
   const { isComplete, completedFor } = useCompletedSessions()
   const program = getProgram(programId)
   const phase = program?.phases.find((p) => p.id === phaseId)
@@ -33,7 +34,7 @@ export default function PhaseDetail() {
       <ScrollReveal key={day.day} delay={idx * 40}>
         <button
           onClick={() => navigate(`/program/${program!.id}/${phase!.id}/w/${week}/d/${day.day}`)}
-          className={`w-full text-left py-4 flex items-center gap-3.5 active:scale-[0.97] transition-transform duration-100 ${
+          className={`row-press w-full text-left py-4 flex items-center gap-3.5 ${
             !isLast ? 'border-b-[0.5px] border-border' : ''
           } ${done ? 'opacity-40' : ''}`}
         >

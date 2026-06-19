@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useVTNavigate } from '../hooks/useVTNavigate'
 import { Plus, Timer } from 'lucide-react'
 import { useWorkout } from '../contexts/WorkoutContext'
 import { useWorkouts } from '../hooks/useWorkouts'
@@ -15,7 +15,7 @@ export default function Workout() {
   const { workout, dispatch } = useWorkout()
   const { saveWorkout } = useWorkouts()
   const { getPreset, savePreset } = usePresets()
-  const navigate = useNavigate()
+  const navigate = useVTNavigate()
   const timer = useElapsed(workout?.startTime)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [swapFor, setSwapFor] = useState<number | null>(null)

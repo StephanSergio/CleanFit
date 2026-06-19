@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useEffect, useLayoutEffect, useRef } from 'react'
+import { HashRouter, Routes, Route, Navigate, useLocation, useNavigationType } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
 import { WorkoutProvider } from './contexts/WorkoutContext'
 import { WorkoutsProvider } from './contexts/WorkoutsContext'
@@ -89,10 +89,39 @@ function ScrollGradient() {
   return null
 }
 
+// Top-level routes that act as peer "tabs" — moving between these crossfades;
+// going deeper (into /program/...) slides forward, and back slides in reverse.
+const TAB_PATHS = ['/', '/programs', '/workout', '/steps', '/profile', '/history', '/progress']
+
+// Sets data-transition on <html> just before each route's view transition runs,
+// so the CSS in index.css can pick the right direction. Runs inside React Router's
+// startViewTransition update, so the attribute is set before the new snapshot.
+function PageTransitions() {
+  const { pathname } = useLocation()
+  const navType = useNavigationType()
+  const prev = useRef(pathname)
+  useLayoutEffect(() => {
+    const from = prev.current
+    const to = pathname
+    if (from === to) return
+    const depth = (p: string) => p.split('/').filter(Boolean).length
+    const isTab = (p: string) => TAB_PATHS.includes(p)
+    let dir: 'fade' | 'forward' | 'back'
+    if (isTab(from) && isTab(to)) dir = 'fade'
+    else if (navType === 'POP') dir = 'back'
+    else if (depth(to) >= depth(from)) dir = 'forward'
+    else dir = 'back'
+    document.documentElement.dataset.transition = dir
+    prev.current = to
+  }, [pathname, navType])
+  return null
+}
+
 export default function App() {
   return (
     <HashRouter>
       <ScrollGradient />
+      <PageTransitions />
       <Routes>
         <Route path="/auth" element={<AuthGuard />} />
         <Route path="/*" element={<ProtectedLayout />} />

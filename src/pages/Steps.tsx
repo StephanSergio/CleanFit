@@ -271,7 +271,7 @@ export default function Steps() {
               return (
                 <div
                   key={entry.date}
-                  className={`py-3.5 cursor-pointer active:opacity-70 transition-opacity ${
+                  className={`row-press py-3.5 cursor-pointer ${
                     i < entries.length - 1 ? 'border-b-[0.5px] border-border' : ''
                   }`}
                   onClick={() => loadEntry(entry)}

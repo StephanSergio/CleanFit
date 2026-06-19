@@ -22,7 +22,7 @@ export default function ExerciseCard({ exercise, onSelect, onSwap, onRemove, mod
           <img
             src={exercise.imageUrl}
             alt={exercise.name}
-            className="w-full h-full object-cover grayscale contrast-110"
+            className="w-full h-full object-cover grayscale brightness-110 contrast-105"
             loading="lazy"
             onError={(e) => {
               const el = e.target as HTMLImageElement

@@ -1,10 +1,10 @@
-import { useNavigate } from 'react-router-dom'
+import { useVTNavigate } from '../hooks/useVTNavigate'
 import { ArrowRight } from 'lucide-react'
 import { PROGRAMS } from '../data/programs'
 import { totalSessions, useProgramProgress } from '../hooks/useProgramProgress'
 
 export default function Programs() {
-  const navigate = useNavigate()
+  const navigate = useVTNavigate()
   const { progress } = useProgramProgress()
 
   return (
@@ -29,7 +29,7 @@ export default function Programs() {
             <button
               key={p.id}
               onClick={() => navigate(`/program/${p.id}`)}
-              className="w-full text-left py-5 flex items-center gap-4 border-b-[0.5px] border-border active:scale-[0.97] transition-transform duration-100"
+              className="row-press w-full text-left py-5 flex items-center gap-4 border-b-[0.5px] border-border"
               style={{
                 borderLeft: `3px solid ${isActive ? 'var(--color-accent)' : 'var(--color-neutral)'}`,
                 paddingLeft: 16,

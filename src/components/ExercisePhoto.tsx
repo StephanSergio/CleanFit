@@ -25,7 +25,7 @@ export default function ExercisePhoto({ img, alt }: Props) {
         alt={alt}
         loading="lazy"
         onError={() => setErrored(true)}
-        className="w-full h-full object-cover grayscale contrast-110"
+        className="w-full h-full object-cover grayscale brightness-110 contrast-105"
       />
     </div>
   )

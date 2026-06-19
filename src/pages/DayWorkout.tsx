@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Timer, CheckCircle2, Clock, Repeat2 } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { useVTNavigate } from '../hooks/useVTNavigate'
+import { ArrowLeft, Timer, CheckCircle2, Clock, Repeat2, Pause, Play, RotateCcw } from 'lucide-react'
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore'
+import { db } from '../lib/firebase'
+import { useAuth } from '../hooks/useAuth'
 import { getProgram } from '../data/programs'
 import { useProgramProgress, useCompletedSessions, getNextSession } from '../hooks/useProgramProgress'
 import { useExerciseImages } from '../hooks/useExerciseImages'
@@ -10,7 +14,7 @@ import RestTimer from '../components/RestTimer'
 import ScrollReveal from '../components/ScrollReveal'
 import ExerciseDrawer from '../components/ExerciseDrawer'
 import PageGlow from '../components/PageGlow'
-import { useElapsed } from '../hooks/useElapsed'
+import { useStopwatch } from '../hooks/useStopwatch'
 import type { WorkoutSet, WgerExercise } from '../types'
 
 function parseReps(setsCount: number, repsStr: string): WorkoutSet[] {
@@ -48,21 +52,27 @@ function clearStored(key: string) {
 export default function DayWorkout() {
   const { programId, phaseId, week: weekParam, dayNum } = useParams()
   const week = Number(weekParam)
-  const navigate = useNavigate()
+  const navigate = useVTNavigate()
   const { saveSession } = useProgramProgress()
   const { markComplete } = useCompletedSessions()
   const { getImage } = useExerciseImages()
   const { saveWorkout, updateWorkout } = useWorkouts()
   const { getPreset, savePreset } = usePresets()
+  const { user } = useAuth()
   const docIdRef = useRef<string | null>(null)
   const creatingRef = useRef(false)
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const buildKeyRef = useRef('')
+  const didScrollRef = useRef(false)
 
   const program = getProgram(programId)
   const phase = program?.phases.find((p) => p.id === phaseId)
   const day = phase?.days.find((d) => d.day === Number(dayNum))
   const storeKey = `${STORE_PREFIX}|${programId}|${phaseId}|${week}|${dayNum}`
+  // Firestore doc ids can't contain '/'; build a safe, unique key for this day.
+  const draftId = `${programId}_${phaseId}_w${week}_d${dayNum}`
+  const timerKey = `timer_v1|${programId}|${phaseId}|${week}|${dayNum}`
 
   const [startTime] = useState(() => loadStored(storeKey)?.startTime ?? Date.now())
   const [tracking, setTracking] = useState(false)
@@ -72,7 +82,7 @@ export default function DayWorkout() {
   const [restKey, setRestKey] = useState(0)
   const [scrolled, setScrolled] = useState(false)
   const [swapIdx, setSwapIdx] = useState<number | null>(null)
-  const timer = useElapsed(startTime)
+  const { display: timer, elapsedMs, running: timerRunning, toggle: toggleTimer, reset: resetTimer, clear: clearTimer } = useStopwatch(timerKey)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80)
@@ -110,9 +120,57 @@ export default function DayWorkout() {
     }))
   }, [storeKey, day, getPreset, tracking])
 
+  // Hydrate an in-progress session from Firestore when there's no local draft —
+  // so a half-finished workout survives a new deploy, a cleared cache, or another
+  // device. The local draft always wins (it's the freshest), and we bail if the
+  // user starts editing before the doc resolves.
   useEffect(() => {
-    if (tracking && exercises.length) saveStored(storeKey, { exercises, docId: docIdRef.current, startTime })
-  }, [exercises, tracking, storeKey, startTime])
+    if (!user || !day) return
+    if (loadStored(storeKey)?.exercises?.length) return
+    let cancelled = false
+    getDoc(doc(db, 'users', user.uid, 'sessionDrafts', draftId))
+      .then((snap) => {
+        if (cancelled || !snap.exists()) return
+        if (loadStored(storeKey)?.exercises?.length) return
+        const data = snap.data() as StoredSession
+        if (!data.exercises?.length) return
+        setExercises(data.exercises)
+        docIdRef.current = data.docId ?? null
+        buildKeyRef.current = storeKey
+        saveStored(storeKey, data)
+        setTracking(true)
+      })
+      .catch(() => {/* offline or denied — local/program build stands */})
+    return () => { cancelled = true }
+  }, [user, day, storeKey, draftId])
+
+  // Persist the live draft locally (instant) and mirror to Firestore (debounced,
+  // durable across deploys/devices).
+  useEffect(() => {
+    if (!tracking || !exercises.length) return
+    const draft: StoredSession = { exercises, docId: docIdRef.current, startTime }
+    saveStored(storeKey, draft)
+    if (!user) return
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current)
+    draftTimerRef.current = setTimeout(() => {
+      setDoc(doc(db, 'users', user.uid, 'sessionDrafts', draftId), {
+        exercises, docId: docIdRef.current ?? null, startTime, updatedAt: Date.now(),
+      }).catch(() => {})
+    }, 800)
+  }, [exercises, tracking, storeKey, startTime, user, draftId])
+
+  // When the workout opens, jump to the first exercise that still has unfinished
+  // sets — so you land where you left off. Runs once per mount.
+  useEffect(() => {
+    if (didScrollRef.current || !tracking || !exercises.length) return
+    didScrollRef.current = true
+    const idx = exercises.findIndex((ex) => ex.sets.some((s) => !s.completed))
+    if (idx <= 0) return
+    const t = setTimeout(() => {
+      document.getElementById(`ex-${idx}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 420)
+    return () => clearTimeout(t)
+  }, [tracking, exercises])
 
   if (!program || !phase || !day) {
     return <div className="min-h-screen flex items-center justify-center">
@@ -185,7 +243,7 @@ export default function DayWorkout() {
     const payload = {
       name: `${program!.name} · W${week} D${day!.day} — ${day!.focus}`,
       date: new Date().toISOString().split('T')[0],
-      durationMinutes: Math.round((Date.now() - startTime) / 60000),
+      durationMinutes: Math.max(0, Math.round(elapsedMs / 60000)),
       exercises: exs.map((ex) => ({
         exerciseId: `${programId}-w${week}-d${day!.day}-${ex.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
         name: ex.name, category: ex.category, imageUrl: null, sets: ex.sets,
@@ -207,6 +265,9 @@ export default function DayWorkout() {
     await persist(exercises)
     markComplete(program!.id, phase!.id, week, day!.day)
     clearStored(storeKey)
+    clearTimer()
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current)
+    if (user) deleteDoc(doc(db, 'users', user.uid, 'sessionDrafts', draftId)).catch(() => {})
     if (nextDay) navigate(`/program/${nextDay.programId}/${nextDay.phaseId}/w/${nextDay.week}/d/${nextDay.dayNum}`)
     else navigate(`/program/${program!.id}`)
   }
@@ -289,10 +350,27 @@ export default function DayWorkout() {
               {program.phases.length > 1 ? `Phase ${phaseIndex} · ` : ''}Week {week} · Day {day.day}
             </p>
             <h1 className="text-[22px] font-display font-medium ink-tint lowercase tracking-[-0.015em] truncate">{day.focus.toLowerCase()}</h1>
-            <div className="flex items-center gap-4 mt-1">
-              <div className="flex items-center gap-1.5 text-ink-mid text-[11px] tracking-[0.05em]">
-                <Clock size={11} />
-                <span className="tabular-nums">{timer}</span>
+            <div className="flex items-center gap-3 mt-1">
+              <div className="flex items-center gap-1.5 text-[11px] tracking-[0.05em]">
+                <Clock size={11} className={timerRunning ? 'text-ink-mid' : 'text-accent'} />
+                <span className={`tabular-nums ${timerRunning ? 'text-ink-mid' : 'text-accent'}`}>{timer}</span>
+                <button
+                  onClick={toggleTimer}
+                  aria-label={timerRunning ? 'Stop timer' : 'Resume timer'}
+                  className="ml-0.5 w-6 h-6 flex items-center justify-center text-ink-muted active:text-accent active:scale-90 transition-all duration-100"
+                >
+                  {timerRunning ? <Pause size={13} /> : <Play size={13} />}
+                </button>
+                <button
+                  onClick={resetTimer}
+                  aria-label="Reset timer"
+                  className="w-6 h-6 flex items-center justify-center text-ink-muted active:text-accent active:scale-90 transition-all duration-100"
+                >
+                  <RotateCcw size={12} />
+                </button>
+                {!timerRunning && (
+                  <span className="text-[9px] font-medium uppercase tracking-[0.16em] text-accent">paused</span>
+                )}
               </div>
               <span className="text-[11px] text-ink-mid tracking-[0.05em]">{completedSets}/{totalSets} sets</span>
             </div>
@@ -311,11 +389,11 @@ export default function DayWorkout() {
           const imgUrl = getImage(ex.name)
 
           return (
-            <div key={exIdx} className={`flex overflow-hidden border-[0.5px] border-border bg-surface transition-opacity ${exDone ? 'opacity-40' : ''}`}>
+            <div key={exIdx} id={`ex-${exIdx}`} className={`flex overflow-hidden border-[0.5px] border-border bg-surface transition-opacity ${exDone ? 'opacity-40' : ''}`}>
               {/* Left — photo */}
               <div className="w-[38%] flex-shrink-0 min-h-[140px] bg-[#EBEBEB] overflow-hidden flex items-center justify-center">
                 {imgUrl
-                  ? <img src={imgUrl} alt={ex.name} loading="lazy" className="w-full h-full object-cover grayscale" />
+                  ? <img src={imgUrl} alt={ex.name} loading="lazy" className="w-full h-full object-cover grayscale brightness-110 contrast-105" />
                   : <span className="text-[28px] font-extralight text-ink-muted">{ex.name.charAt(0).toLowerCase()}</span>
                 }
               </div>

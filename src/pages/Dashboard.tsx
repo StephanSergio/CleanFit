@@ -1,9 +1,9 @@
-import { useNavigate } from 'react-router-dom'
+import { useVTNavigate } from '../hooks/useVTNavigate'
 import { ArrowRight } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { useWorkout } from '../contexts/WorkoutContext'
-import { useProgramProgress, useCompletedSessions, totalSessions } from '../hooks/useProgramProgress'
+import { useProgramProgress, useCompletedSessions, totalSessions, getNextSession } from '../hooks/useProgramProgress'
 import { PROGRAMS, getProgram } from '../data/programs'
 
 const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
@@ -15,7 +15,7 @@ export default function Dashboard() {
   const { dispatch } = useWorkout()
   const { progress } = useProgramProgress()
   const { completedFor, isComplete } = useCompletedSessions()
-  const navigate = useNavigate()
+  const navigate = useVTNavigate()
 
   const name = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'there'
 
@@ -46,8 +46,25 @@ export default function Dashboard() {
 
   const sessionCount = weekRows.filter((r) => !r.isRest).length
 
+  // Where "Resume" should take you: your current in-progress day, or — if that
+  // day is already finished — the next scheduled day/week/phase.
+  const resume = (() => {
+    if (!progress) return null
+    const complete = isComplete(progress.programId, progress.phaseId, progress.week, progress.dayNum)
+    if (!complete) return { ...progress, isNext: false }
+    const next = getNextSession(progress.programId, progress.phaseId, progress.week, progress.dayNum)
+    if (!next) return null
+    const ph = getProgram(next.programId)?.phases.find((p) => p.id === next.phaseId)
+    const d = ph?.days.find((dd) => dd.day === next.dayNum)
+    return { ...next, focus: d?.focus ?? '', isNext: true }
+  })()
+
+  const ctaLabel = resume
+    ? `${resume.isNext ? 'Next' : 'Resume'}: ${resume.focus}`
+    : "Start today's workout"
+
   function startToday() {
-    if (progress) navigate(`/program/${progress.programId}/${progress.phaseId}/w/${progress.week}/d/${progress.dayNum}`)
+    if (resume) navigate(`/program/${resume.programId}/${resume.phaseId}/w/${resume.week}/d/${resume.dayNum}`)
     else if (phase) navigate(`/program/${activeProgram.id}/${phase.id}/w/1/d/${phase.days[0].day}`)
     else navigate('/programs')
   }
@@ -131,7 +148,11 @@ export default function Dashboard() {
                 disabled={row.isRest}
                 className={`w-full flex items-center gap-3.5 py-3.5 border-b-[0.5px] border-border last:border-b-0 text-left active:scale-[0.99] transition-transform duration-100 ${row.isRest ? 'cursor-default' : ''}`}
                 style={isToday && !row.isRest
-                  ? { borderLeft: '3px solid var(--color-accent)', paddingLeft: 13, background: 'var(--color-accent-bg)' }
+                  ? {
+                      borderLeft: '2px solid var(--color-accent)',
+                      paddingLeft: 14,
+                      background: 'linear-gradient(90deg, color-mix(in oklab, var(--color-accent) 13%, transparent) 0%, transparent 72%)',
+                    }
                   : { paddingLeft: 16 }}
               >
                 <span className="font-display text-[13px] font-medium text-ink-muted tabular-nums w-6 flex-shrink-0">
@@ -160,10 +181,10 @@ export default function Dashboard() {
       <div className="px-6 pt-6 pb-3">
         <button
           onClick={startToday}
-          className="w-full bg-accent text-white py-[18px] px-5 flex items-center justify-between active:opacity-80 active:scale-[0.98] transition-all duration-100"
+          className="w-full bg-accent text-white py-[18px] px-5 flex items-center justify-between gap-3 active:opacity-80 active:scale-[0.98] transition-all duration-100"
         >
-          <span className="t-cta">Start today's workout</span>
-          <ArrowRight size={16} />
+          <span className="t-cta truncate text-left">{ctaLabel}</span>
+          <ArrowRight size={16} className="flex-shrink-0" />
         </button>
       </div>
 
