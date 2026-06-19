@@ -4,6 +4,7 @@ import { TrendingUp } from 'lucide-react'
 import { useWorkouts } from '../hooks/useWorkouts'
 import CircleRing from '../components/CircleRing'
 import { useTheme } from '../contexts/ThemeContext'
+import ScrollReveal from '../components/ScrollReveal'
 
 const CHART = {
   light: { accent: '#4f46e5', ink: '#1a1a1a', mid: '#636158', grid: '#e3e0d9', axis: '#B5B2AA', surface: '#faf9f6', track: '#e3e0d9' },
@@ -60,6 +61,7 @@ export default function Progress() {
       </div>
 
       {/* Circle ring */}
+      <ScrollReveal>
       <div className="px-6 mb-6 flex items-center justify-center">
         <div className="relative flex items-center justify-center">
           <CircleRing
@@ -75,8 +77,10 @@ export default function Progress() {
           </div>
         </div>
       </div>
+      </ScrollReveal>
 
       {/* Stat cards */}
+      <ScrollReveal delay={60}>
       <div className="px-6 mb-6 grid grid-cols-2 gap-3 apex-stagger">
         <div className="bg-surface border-[0.5px] border-border px-4 py-4">
           <p className="text-[28px] font-extralight text-ink leading-none">{totalSets}</p>
@@ -87,7 +91,9 @@ export default function Progress() {
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mt-1">Exercises tracked</p>
         </div>
       </div>
+      </ScrollReveal>
 
+      <ScrollReveal delay={120}>
       <div className="px-6">
         {exerciseNames.length === 0 ? (
           <div className="border-[0.5px] border-border p-10 text-center">
@@ -187,6 +193,7 @@ export default function Progress() {
           </>
         )}
       </div>
+      </ScrollReveal>
     </div>
   )
 }

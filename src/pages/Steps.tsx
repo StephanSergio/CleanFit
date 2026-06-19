@@ -6,6 +6,7 @@ import {
 } from 'recharts'
 import { useSteps } from '../contexts/StepsContext'
 import { useTheme } from '../contexts/ThemeContext'
+import ScrollReveal from '../components/ScrollReveal'
 
 const GOAL = 10_000
 
@@ -107,6 +108,7 @@ export default function Steps() {
       </div>
 
       {/* Today hero */}
+      <ScrollReveal>
       <div className="px-6 mb-5 apex-fade">
         <div
           className="bg-surface p-5 transition-all duration-500"
@@ -141,8 +143,10 @@ export default function Steps() {
           )}
         </div>
       </div>
+      </ScrollReveal>
 
       {/* Stat cards */}
+      <ScrollReveal delay={60}>
       <div className="px-6 mb-5 grid grid-cols-2 gap-3 apex-stagger">
         <div className="bg-surface border-[0.5px] border-border px-4 py-4">
           <p className="text-[28px] font-extralight text-ink leading-none tabular-nums">
@@ -157,8 +161,10 @@ export default function Steps() {
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mt-1">best day</p>
         </div>
       </div>
+      </ScrollReveal>
 
       {/* Log form */}
+      <ScrollReveal delay={120}>
       <div className="px-6 mb-5">
         <div className="bg-surface border-[0.5px] border-border p-4">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-4">Log Steps</p>
@@ -201,8 +207,10 @@ export default function Steps() {
           </div>
         </div>
       </div>
+      </ScrollReveal>
 
       {/* 7-day bar chart */}
+      <ScrollReveal delay={180}>
       <div className="px-6 mb-5">
         <div className="bg-surface border-[0.5px] border-border p-4">
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-4">Last 7 Days</p>
@@ -253,8 +261,10 @@ export default function Steps() {
           </p>
         </div>
       </div>
+      </ScrollReveal>
 
       {/* History */}
+      <ScrollReveal delay={240}>
       <div className="px-6">
         <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-3">History</p>
         {entries.length === 0 ? (
@@ -310,6 +320,7 @@ export default function Steps() {
           </div>
         )}
       </div>
+      </ScrollReveal>
     </div>
   )
 }

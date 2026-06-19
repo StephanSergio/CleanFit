@@ -7,6 +7,7 @@ import { useTheme } from '../contexts/ThemeContext'
 import { Sun, Moon } from 'lucide-react'
 import { updateProfile } from 'firebase/auth'
 import { auth } from '../lib/firebase'
+import ScrollReveal from '../components/ScrollReveal'
 
 export default function Profile() {
   const { user, logOut } = useAuth()
@@ -69,6 +70,7 @@ export default function Profile() {
       </div>
 
       {/* Avatar */}
+      <ScrollReveal>
       <div className="flex flex-col items-center pt-10 pb-8 px-6">
         <div
           className="w-20 h-20 flex items-center justify-center mb-4"
@@ -84,6 +86,7 @@ export default function Profile() {
         </h1>
         <p className="text-[13px] font-light text-ink-muted mt-1 tracking-[0.03em]">{email}</p>
       </div>
+      </ScrollReveal>
 
       {/* Your info */}
       <div className="px-6 border-t-[0.5px] border-border pt-6 pb-4">
@@ -115,6 +118,7 @@ export default function Profile() {
       </div>
 
       {/* Appearance */}
+      <ScrollReveal delay={60}>
       <div className="px-6 border-t-[0.5px] border-border pt-6 pb-4">
         <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-4">Appearance</p>
         <div className="grid grid-cols-2 gap-3">
@@ -138,8 +142,10 @@ export default function Profile() {
           })}
         </div>
       </div>
+      </ScrollReveal>
 
       {/* Stats */}
+      <ScrollReveal delay={120}>
       <div className="px-6 border-t-[0.5px] border-border pt-6 pb-6">
         <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-5">Stats</p>
 
@@ -156,8 +162,10 @@ export default function Profile() {
           ))}
         </div>
       </div>
+      </ScrollReveal>
 
       {/* Actions */}
+      <ScrollReveal delay={180}>
       <div className="px-6 pt-2 pb-8 border-t-[0.5px] border-border flex flex-col gap-3">
         <button
           onClick={handleSave}
@@ -174,6 +182,7 @@ export default function Profile() {
           Sign Out
         </button>
       </div>
+      </ScrollReveal>
     </div>
   )
 }

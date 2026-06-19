@@ -5,6 +5,7 @@ import { useWorkouts } from '../hooks/useWorkouts'
 import { useWorkout } from '../contexts/WorkoutContext'
 import { useProgramProgress, useCompletedSessions, totalSessions, getNextSession } from '../hooks/useProgramProgress'
 import { PROGRAMS, getProgram } from '../data/programs'
+import ScrollReveal from '../components/ScrollReveal'
 
 const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const SCHEDULE_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
@@ -86,6 +87,7 @@ export default function Dashboard() {
       </div>
 
       {/* Hero — current program */}
+      <ScrollReveal>
       <div className="px-6 pt-7 pb-7">
         <div className="flex items-baseline justify-between mb-3">
           <span className="t-eyebrow">Current Program</span>
@@ -125,8 +127,10 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      </ScrollReveal>
 
       {/* This week — numbered index */}
+      <ScrollReveal delay={60}>
       <div className="px-6 pb-1">
         <div className="flex items-baseline justify-between border-b-[1.5px] border-ink pb-2.5 mb-1">
           <span className="t-eyebrow">This Week</span>
@@ -176,8 +180,10 @@ export default function Dashboard() {
           })}
         </div>
       </div>
+      </ScrollReveal>
 
       {/* Primary CTA */}
+      <ScrollReveal delay={120}>
       <div className="px-6 pt-6 pb-3">
         <button
           onClick={startToday}
@@ -187,6 +193,8 @@ export default function Dashboard() {
           <ArrowRight size={16} className="flex-shrink-0" />
         </button>
       </div>
+
+      </ScrollReveal>
 
       {/* Secondary actions */}
       <div className="px-6 pb-6 flex items-center gap-6">
@@ -205,6 +213,7 @@ export default function Dashboard() {
 
       {/* Recent */}
       {workouts.length > 0 && (
+        <ScrollReveal delay={180}>
         <div className="px-6 pt-2 border-t-[0.5px] border-border">
           <p className="t-eyebrow pt-6 mb-3">Recent</p>
           {workouts.slice(0, 4).map((w) => (
@@ -217,6 +226,7 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
+        </ScrollReveal>
       )}
     </div>
   )

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useWorkouts } from '../hooks/useWorkouts'
+import ScrollReveal from '../components/ScrollReveal'
 
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
@@ -32,6 +33,7 @@ export default function History() {
       </div>
 
       {/* Calendar card */}
+      <ScrollReveal>
       <div className="mx-6 mb-5 bg-surface border-[0.5px] border-border overflow-hidden apex-fade">
         <div className="px-5 pt-4 pb-2">
           <div className="flex items-center justify-between mb-4">
@@ -79,9 +81,11 @@ export default function History() {
           </div>
         </div>
       </div>
+      </ScrollReveal>
 
       {/* Workout list */}
       {!loading && (
+      <ScrollReveal delay={60}>
       <div className="px-6">
         <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mb-3">All Workouts</p>
         {workouts.length === 0 ? (
@@ -139,6 +143,7 @@ export default function History() {
           </div>
         )}
       </div>
+      </ScrollReveal>
       )}
     </div>
   )

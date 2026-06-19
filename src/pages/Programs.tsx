@@ -2,6 +2,7 @@ import { useVTNavigate } from '../hooks/useVTNavigate'
 import { ArrowRight } from 'lucide-react'
 import { PROGRAMS } from '../data/programs'
 import { totalSessions, useProgramProgress } from '../hooks/useProgramProgress'
+import ScrollReveal from '../components/ScrollReveal'
 
 export default function Programs() {
   const navigate = useVTNavigate()
@@ -20,6 +21,7 @@ export default function Programs() {
       </div>
 
       {/* Programs list */}
+      <ScrollReveal>
       <div className="px-6 apex-stagger">
         {PROGRAMS.map((p) => {
           const total = totalSessions(p.id)
@@ -65,6 +67,7 @@ export default function Programs() {
           )
         })}
       </div>
+      </ScrollReveal>
     </div>
   )
 }
