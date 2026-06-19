@@ -104,6 +104,12 @@ function PageTransitions() {
     const from = prev.current
     const to = pathname
     if (from === to) return
+    prev.current = to
+    // Only drive data-transition when the browser actually runs View Transitions
+    // (Safari 18+/modern Chrome). Otherwise leave it unset so the per-page
+    // entrance animations (apex-page fade/rise) still play as the fallback —
+    // setting it would suppress them AND there'd be no transition to replace them.
+    if (!('startViewTransition' in document)) return
     const depth = (p: string) => p.split('/').filter(Boolean).length
     const isTab = (p: string) => TAB_PATHS.includes(p)
     let dir: 'fade' | 'forward' | 'back'
@@ -112,7 +118,6 @@ function PageTransitions() {
     else if (depth(to) >= depth(from)) dir = 'forward'
     else dir = 'back'
     document.documentElement.dataset.transition = dir
-    prev.current = to
   }, [pathname, navType])
   return null
 }
