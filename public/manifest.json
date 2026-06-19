@@ -1,6 +1,6 @@
 {
-  "name": "FitLog",
-  "short_name": "FitLog",
+  "name": "CleanFit",
+  "short_name": "CleanFit",
   "description": "Track your workouts and progress",
   "start_url": "/CleanFit/",
   "display": "standalone",

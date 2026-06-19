@@ -18,6 +18,7 @@ export default function Dashboard() {
   const navigate = useNavigate()
 
   const name = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'there'
+
   const activeProgram = getProgram(progress?.programId) ?? PROGRAMS[0]
   const done = completedFor(activeProgram.id)
   const total = totalSessions(activeProgram.id)
@@ -61,7 +62,7 @@ export default function Dashboard() {
       {/* Masthead */}
       <div className="px-6 pt-14">
         <div className="flex items-baseline justify-between">
-          <span className="font-display text-[15px] font-bold uppercase tracking-[0.18em] text-ink">Fitlog</span>
+          <span className="font-display text-[15px] font-bold uppercase tracking-[0.18em] text-ink">CleanFit</span>
           <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted">{name}</span>
         </div>
         <div className="mt-3 h-[2px] bg-ink" />

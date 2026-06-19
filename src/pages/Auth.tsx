@@ -39,7 +39,7 @@ export default function Auth() {
     <div className="min-h-screen flex flex-col px-6 apex-page">
       {/* Brand label */}
       <p className="pt-14 text-[11px] font-medium uppercase tracking-[0.2em] text-ink">
-        FITLOG
+        CLEANFIT
       </p>
 
       <div className="flex-1 flex flex-col justify-center">
