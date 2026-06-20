@@ -35,10 +35,19 @@ export function StepsProvider({ children }: { children: ReactNode }) {
       orderBy('date', 'desc'),
       limit(90)
     )
-    const unsub = onSnapshot(q, (snap) => {
-      setEntries(snap.docs.map((d) => ({ id: d.id, ...d.data() } as StepEntry)))
-      setLoading(false)
-    })
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        setEntries(snap.docs.map((d) => ({ id: d.id, ...d.data() } as StepEntry)))
+        setLoading(false)
+      },
+      (err) => {
+        // Don't fail silently — a denied/erroring listener is exactly what makes
+        // logged steps look like they "didn't save".
+        console.error('steps onSnapshot failed', err)
+        setLoading(false)
+      }
+    )
     return unsub
   }, [user])
 
@@ -46,7 +55,7 @@ export function StepsProvider({ children }: { children: ReactNode }) {
     if (!user) return
     await setDoc(doc(db, 'users', user.uid, 'steps', date), {
       date,
-      steps,
+      steps: Math.max(0, Math.round(steps)),
       createdAt: Date.now(),
     })
   }

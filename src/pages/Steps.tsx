@@ -16,8 +16,15 @@ const CHART = {
   dark:  { accent: '#6366f1', ink: '#f3f1ec', grid: '#2a2a26', axis: '#6f6c63', surface: '#1b1b18', track: '#2a2a26', cursor: '#1b1b18' },
 }
 
+// Local calendar date (YYYY-MM-DD) — uses the device's date, not UTC, so
+// "today" matches the date picker and the user's calendar in every timezone.
+function ymd(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+    d.getDate()
+  ).padStart(2, '0')}`
+}
 function todayStr() {
-  return new Date().toISOString().split('T')[0]
+  return ymd(new Date())
 }
 
 function fmtDate(dateStr: string) {
@@ -32,7 +39,7 @@ export default function Steps() {
   const c = isDark ? CHART.dark : CHART.light
   const [date, setDate] = useState(todayStr())
   const [stepsInput, setStepsInput] = useState('')
-  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
 
   const entryMap = useMemo(() => {
     const m = new Map<string, number>()
@@ -61,7 +68,7 @@ export default function Steps() {
     for (let i = 6; i >= 0; i--) {
       const d = new Date()
       d.setDate(d.getDate() - i)
-      const ds = d.toISOString().split('T')[0]
+      const ds = ymd(d)
       days.push({
         label: d.toLocaleDateString('en-GB', { weekday: 'short' }),
         steps: entryMap.get(ds) ?? 0,
@@ -77,18 +84,24 @@ export default function Steps() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  async function handleLog() {
-    const n = parseInt(stepsInput, 10)
+  function handleLog() {
+    const n = parseInt(stepsInput.replace(/[^\d]/g, ''), 10)
     if (!date || isNaN(n) || n < 0) return
-    setSaving(true)
+    const loggedDate = date
+    setError('')
     // Optimistic: the write lands in the local cache immediately and onSnapshot
     // reflects it right away, so we don't block the UI on a server round-trip.
-    // The promise only settles once synced — offline it stays pending, which is
-    // fine because the entry is already persisted locally and will sync later.
-    logSteps(date, n).catch(() => {})
+    // The promise settles once synced; offline it stays pending (fine — it's
+    // already persisted locally). A real rejection (e.g. permission denied) is
+    // surfaced and the input is restored so nothing is silently lost.
+    logSteps(loggedDate, n).catch((e) => {
+      console.error('logSteps failed', e)
+      setError('Could not save those steps. Check your connection — if it keeps happening, the Firestore rules may need publishing.')
+      setStepsInput(String(n))
+      setDate(loggedDate)
+    })
     setStepsInput('')
     setDate(todayStr())
-    setSaving(false)
   }
 
   if (loading) {
@@ -196,15 +209,15 @@ export default function Steps() {
             </div>
             <button
               onClick={handleLog}
-              disabled={!stepsInput || saving}
+              disabled={!stepsInput}
               className="flex items-center justify-center w-10 h-10 bg-accent flex-shrink-0 transition-opacity disabled:opacity-30 active:opacity-70"
             >
-              {saving
-                ? <div className="w-4 h-4 border border-white border-t-transparent rounded-full animate-spin" />
-                : <Check size={16} strokeWidth={1.5} color="#ffffff" />
-              }
+              <Check size={16} strokeWidth={1.5} color="#ffffff" />
             </button>
           </div>
+          {error && (
+            <p className="text-[11px] font-light text-accent mt-3 leading-relaxed">{error}</p>
+          )}
         </div>
       </div>
       </ScrollReveal>
