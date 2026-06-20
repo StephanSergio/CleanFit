@@ -1,5 +1,6 @@
 import { Check, Minus, Plus } from 'lucide-react'
 import type { WorkoutSet } from '../types'
+import NumField from './NumField'
 
 interface Props {
   setNumber: number
@@ -32,12 +33,12 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
             <Minus size={13} strokeWidth={2} />
           </button>
           <div className="flex flex-col items-center">
-            <input
-              type="number"
-              inputMode="numeric"
+            <NumField
               value={set.reps}
+              integer
               min={1}
-              onChange={(e) => onChange({ reps: Math.max(1, parseInt(e.target.value) || 1) })}
+              ariaLabel="reps"
+              onCommit={(reps) => onChange({ reps })}
               className="w-10 text-center text-[16px] font-extralight bg-transparent text-white focus:outline-none border-b-[0.5px] border-[#2A2A28] focus:border-accent py-0.5"
             />
             <span className="text-[9px] font-medium uppercase tracking-[0.14em] text-[#4A4844] mt-1">reps</span>
@@ -65,13 +66,12 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
             <Minus size={13} strokeWidth={2} />
           </button>
           <div className="flex flex-col items-center">
-            <input
-              type="number"
-              inputMode="decimal"
+            <NumField
               value={set.weightKg}
               min={0}
               step={2.5}
-              onChange={(e) => onChange({ weightKg: Math.max(0, parseFloat(e.target.value) || 0) })}
+              ariaLabel="weight in kg"
+              onCommit={(weightKg) => onChange({ weightKg })}
               className="w-12 text-center text-[16px] font-extralight bg-transparent text-white focus:outline-none border-b-[0.5px] border-[#2A2A28] focus:border-accent py-0.5"
             />
             <span className="text-[9px] font-medium uppercase tracking-[0.14em] text-[#4A4844] mt-1">kg</span>

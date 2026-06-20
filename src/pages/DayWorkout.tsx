@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useVTNavigate } from '../hooks/useVTNavigate'
-import { ArrowLeft, Timer, CheckCircle2, Clock, Repeat2, Pause, Play, RotateCcw } from 'lucide-react'
+import { ArrowLeft, Timer, CheckCircle2, Clock, Repeat2, Pause, Play, RotateCcw, Plus, X } from 'lucide-react'
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useAuth } from '../hooks/useAuth'
@@ -15,6 +15,7 @@ import ScrollReveal from '../components/ScrollReveal'
 import ExerciseDrawer from '../components/ExerciseDrawer'
 import PageGlow from '../components/PageGlow'
 import { useStopwatch } from '../hooks/useStopwatch'
+import NumField from '../components/NumField'
 import type { WorkoutSet, WgerExercise } from '../types'
 
 function parseReps(setsCount: number, repsStr: string): WorkoutSet[] {
@@ -82,6 +83,7 @@ export default function DayWorkout() {
   const [restKey, setRestKey] = useState(0)
   const [scrolled, setScrolled] = useState(false)
   const [swapIdx, setSwapIdx] = useState<number | null>(null)
+  const [addOpen, setAddOpen] = useState(false)
   const { display: timer, elapsedMs, running: timerRunning, toggle: toggleTimer, reset: resetTimer, clear: clearTimer } = useStopwatch(timerKey)
 
   useEffect(() => {
@@ -234,6 +236,39 @@ export default function DayWorkout() {
       }
     }))
     setSwapIdx(null)
+  }
+
+  // Add any library exercise to THIS session, even if it isn't in the program.
+  // It's appended to the live list and saved with the rest — existing exercises
+  // and their logged sets are untouched.
+  function handleAdd(ex: WgerExercise) {
+    const preset = getPreset(ex.name)
+    const count = preset?.weights.length || 3
+    const weights = applyPresetWeights(preset, count, 10)
+    const repsFor = (i: number) => {
+      if (!preset || !preset.reps.length) return 10
+      return preset.reps[i] ?? preset.reps[preset.reps.length - 1]
+    }
+    setExercises((prev) => [
+      ...prev,
+      {
+        name: ex.name,
+        category: ex.category,
+        superset: false,
+        prescription: `${count} sets · added`,
+        sets: Array.from({ length: count }, (_, i) => ({
+          reps: repsFor(i),
+          weightKg: weights[i],
+          completed: false,
+        })),
+      },
+    ])
+    setAddOpen(false)
+  }
+
+  // Remove an exercise from this session (e.g. an ad-hoc one you added).
+  function removeExercise(exIdx: number) {
+    setExercises((prev) => prev.filter((_, i) => i !== exIdx))
   }
 
   async function persist(exs: TrackingExercise[]) {
@@ -415,6 +450,13 @@ export default function DayWorkout() {
                   >
                     <Repeat2 size={14} />
                   </button>
+                  <button
+                    onClick={() => removeExercise(exIdx)}
+                    className="text-ink-muted active:text-accent flex-shrink-0 mt-0.5 active:scale-90 transition-all duration-100"
+                    aria-label="Remove exercise"
+                  >
+                    <X size={14} />
+                  </button>
                 </div>
                 <div className="flex items-center gap-2 mb-2">
                   <p className="text-[10px] font-light text-ink-mid tracking-[0.03em] truncate">{ex.prescription}</p>
@@ -430,17 +472,23 @@ export default function DayWorkout() {
                       <span className="text-[10px] font-light text-ink-mid w-3 flex-shrink-0">{setIdx + 1}</span>
                       <div className="flex flex-1 min-w-0 items-center gap-1.5">
                         <div className="flex-1 min-w-0 flex flex-col items-center overflow-hidden">
-                          <input
-                            type="number" inputMode="numeric" value={set.reps} min={1}
-                            onChange={(e) => updateSet(exIdx, setIdx, { reps: Math.max(1, parseInt(e.target.value) || 1) })}
+                          <NumField
+                            value={set.reps}
+                            integer
+                            min={1}
+                            ariaLabel="reps"
+                            onCommit={(reps) => updateSet(exIdx, setIdx, { reps })}
                             className="w-full min-w-0 text-center text-[16px] font-extralight bg-transparent text-ink focus:outline-none border-b-[0.5px] border-border focus:border-accent pb-0.5"
                           />
                           <span className="text-[8px] font-medium text-ink-mid uppercase tracking-[0.12em] mt-0.5">reps</span>
                         </div>
                         <div className="flex-1 min-w-0 flex flex-col items-center overflow-hidden">
-                          <input
-                            type="number" inputMode="decimal" value={set.weightKg} min={0} step={2.5}
-                            onChange={(e) => updateSet(exIdx, setIdx, { weightKg: Math.max(0, parseFloat(e.target.value) || 0) })}
+                          <NumField
+                            value={set.weightKg}
+                            min={0}
+                            step={2.5}
+                            ariaLabel="weight in kg"
+                            onCommit={(weightKg) => updateSet(exIdx, setIdx, { weightKg })}
                             className="w-full min-w-0 text-center text-[16px] font-extralight bg-transparent text-ink focus:outline-none border-b-[0.5px] border-border focus:border-accent pb-0.5"
                           />
                           <span className="text-[8px] font-medium text-ink-mid uppercase tracking-[0.12em] mt-0.5">kg</span>
@@ -470,6 +518,14 @@ export default function DayWorkout() {
             </div>
           )
         })}
+
+        {/* Add an exercise that isn't part of the program for this session. */}
+        <button
+          onClick={() => setAddOpen(true)}
+          className="flex items-center justify-center gap-2 border-[0.5px] border-dashed border-border py-3 text-[11px] font-medium uppercase tracking-[0.2em] text-ink-mid active:text-accent active:scale-[0.99] transition-all duration-100"
+        >
+          <Plus size={14} /> Add exercise
+        </button>
       </div>
 
       {restActive && <RestTimer key={restKey} onDismiss={() => setRestActive(false)} />}
@@ -483,10 +539,10 @@ export default function DayWorkout() {
       </div>
 
       <ExerciseDrawer
-        open={swapIdx !== null}
-        onClose={() => setSwapIdx(null)}
-        onSelect={handleSwap}
-        title="Swap Exercise"
+        open={swapIdx !== null || addOpen}
+        onClose={() => { setSwapIdx(null); setAddOpen(false) }}
+        onSelect={(ex) => (addOpen ? handleAdd(ex) : handleSwap(ex))}
+        title={addOpen ? 'Add Exercise' : 'Swap Exercise'}
       />
     </div>
     </>

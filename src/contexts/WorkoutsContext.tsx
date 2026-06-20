@@ -1,8 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import type { ReactNode } from 'react'
 import {
-  collection, doc, addDoc, updateDoc, getDocs,
-  query, orderBy, limit, serverTimestamp,
+  collection, doc, addDoc, updateDoc, getDocs, serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import type { Workout } from '../types'
@@ -29,8 +28,12 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
     if (!ref) return
     setLoading(true)
     try {
-      const snap = await getDocs(query(ref, orderBy('createdAt', 'desc'), limit(50)))
-      setWorkouts(snap.docs.map((d) => {
+      // Fetch ALL workouts and sort client-side. We deliberately don't use
+      // orderBy('createdAt') here: Firestore drops any document missing that
+      // field, which silently hid older/offline-saved sessions from History
+      // and Progress. Sorting in JS keeps every session.
+      const snap = await getDocs(ref)
+      const list = snap.docs.map((d) => {
         const data = d.data()
         return {
           id: d.id,
@@ -40,7 +43,14 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
           exercises: data.exercises ?? [],
           createdAt: data.createdAt?.seconds,
         } as Workout
-      }))
+      })
+      const sortKey = (w: Workout) =>
+        w.createdAt ? w.createdAt * 1000 : Date.parse(w.date) || 0
+      list.sort((a, b) => sortKey(b) - sortKey(a))
+      setWorkouts(list)
+    } catch (err) {
+      // Don't swallow — a silent failure here is exactly what hid Progress.
+      console.error('fetchWorkouts failed', err)
     } finally {
       setLoading(false)
     }
