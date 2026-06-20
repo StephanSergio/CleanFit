@@ -1,8 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import {
-  collection, doc, setDoc, deleteDoc,
-  query, orderBy, limit, onSnapshot,
+  collection, doc, setDoc, deleteDoc, onSnapshot,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useAuth } from '../hooks/useAuth'
@@ -30,15 +29,18 @@ export function StepsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user) { setEntries([]); setLoading(false); return }
-    const q = query(
-      collection(db, 'users', user.uid, 'steps'),
-      orderBy('date', 'desc'),
-      limit(90)
-    )
+    // Listen to the whole collection and sort client-side. We deliberately avoid
+    // orderBy('date')/limit in the query: that makes reads depend on a field
+    // index and silently drops any doc missing the field — the same class of bug
+    // that hid workouts from Progress. Sorting in JS keeps every entry.
     const unsub = onSnapshot(
-      q,
+      collection(db, 'users', user.uid, 'steps'),
       (snap) => {
-        setEntries(snap.docs.map((d) => ({ id: d.id, ...d.data() } as StepEntry)))
+        const list = snap.docs.map(
+          (d) => ({ id: d.id, ...d.data() } as StepEntry)
+        )
+        list.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0)) // date desc
+        setEntries(list.slice(0, 90))
         setLoading(false)
       },
       (err) => {
