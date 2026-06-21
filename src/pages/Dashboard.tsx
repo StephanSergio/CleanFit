@@ -7,8 +7,23 @@ import { useProgramProgress, useCompletedSessions, totalSessions, getNextSession
 import { PROGRAMS, getProgram } from '../data/programs'
 import ScrollReveal from '../components/ScrollReveal'
 
-const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-const SCHEDULE_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+// The whole week, Monday → Sunday. `idx` is JS getDay() (0=Sun…6=Sat) so it
+// lines up with "today" and with the date math below. Weekends are first-class
+// training days now.
+const WEEK_ORDER: { key: string; idx: number; label: string }[] = [
+  { key: 'monday', idx: 1, label: 'MON' },
+  { key: 'tuesday', idx: 2, label: 'TUE' },
+  { key: 'wednesday', idx: 3, label: 'WED' },
+  { key: 'thursday', idx: 4, label: 'THU' },
+  { key: 'friday', idx: 5, label: 'FRI' },
+  { key: 'saturday', idx: 6, label: 'SAT' },
+  { key: 'sunday', idx: 0, label: 'SUN' },
+]
+
+// YYYY-MM-DD for a date (matches how workouts store their `date`).
+function ymd(d: Date) {
+  return d.toISOString().split('T')[0]
+}
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -32,17 +47,34 @@ export default function Dashboard() {
   const curWeek = progress?.programId === activeProgram.id ? progress.week : 1
   const todayIndex = new Date().getDay()
 
+  // Calendar date (YYYY-MM-DD) for each weekday of the CURRENT week, keyed by
+  // getDay() index. Lets us mark a day done when a workout was actually logged
+  // that day — regardless of which day the program scheduled it for.
+  const weekDates: Record<number, string> = (() => {
+    const now = new Date()
+    const monday = new Date(now)
+    monday.setDate(now.getDate() - ((now.getDay() + 6) % 7)) // back to this week's Monday
+    const map: Record<number, string> = {}
+    WEEK_ORDER.forEach(({ idx }, i) => {
+      const d = new Date(monday)
+      d.setDate(monday.getDate() + i) // i: Mon=0 … Sun=6
+      map[idx] = ymd(d)
+    })
+    return map
+  })()
+  const workoutDates = new Set(workouts.map((w) => w.date))
+
   const weekRows = activeProgram.schedule
-    ? SCHEDULE_KEYS.slice(1, 6).map((key, i) => {
+    ? WEEK_ORDER.map(({ key, idx, label }) => {
         const dayId = activeProgram.schedule![key]
         const isRest = !dayId || dayId === 'rest'
         const day = isRest ? null : phase?.days.find(
           (d) => `day_${d.day}` === dayId || d.day.toString() === dayId.replace('day_', '')
         )
-        return { dayLabel: WEEK_DAYS[i + 1], dayIndex: i + 1, dayNum: day?.day ?? null, focus: day?.focus ?? 'Rest', isRest }
+        return { dayLabel: label, dayIndex: idx, dayNum: day?.day ?? null, focus: day?.focus ?? 'Rest', isRest }
       })
-    : (phase?.days ?? []).slice(0, 5).map((day, i) => ({
-        dayLabel: WEEK_DAYS[i + 1], dayIndex: i + 1, dayNum: day.day, focus: day.focus, isRest: false,
+    : (phase?.days ?? []).map((day, i) => ({
+        dayLabel: WEEK_ORDER[i % 7].label, dayIndex: WEEK_ORDER[i % 7].idx, dayNum: day.day, focus: day.focus, isRest: false,
       }))
 
   const sessionCount = weekRows.filter((r) => !r.isRest).length
@@ -140,9 +172,13 @@ export default function Dashboard() {
         </div>
         <div className="apex-stagger">
           {weekRows.map((row, i) => {
-            const isDone = row.dayNum !== null && phase
+            const scheduledDone = row.dayNum !== null && phase
               ? isComplete(activeProgram.id, phase.id, curWeek, row.dayNum)
               : false
+            // Also "done" if you actually trained that calendar day — so doing a
+            // workout today marks today, not whatever day it was scheduled for.
+            const trainedThatDay = workoutDates.has(weekDates[row.dayIndex])
+            const isDone = scheduledDone || trainedThatDay
             const isToday = row.dayIndex === todayIndex
 
             return (
@@ -170,10 +206,10 @@ export default function Dashboard() {
                 }`}>
                   {row.focus}
                 </span>
-                {row.isRest
-                  ? <span className="text-[11px] text-ink-muted flex-shrink-0">rest</span>
-                  : isDone
+                {isDone
                   ? <span className="text-[14px] text-accent flex-shrink-0 w-4 text-right">✓</span>
+                  : row.isRest
+                  ? <span className="text-[11px] text-ink-muted flex-shrink-0">rest</span>
                   : <ArrowRight size={15} className={`flex-shrink-0 ${isToday ? 'text-accent' : 'text-ink-muted'}`} />}
               </button>
             )

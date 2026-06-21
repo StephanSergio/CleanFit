@@ -7,12 +7,12 @@ export const BUILD_MUSCLE: Program = {
   daysPerWeek: 4,
   schedule: {
     monday: 'day_1',
-    tuesday: 'day_2',
-    wednesday: 'day_3',
+    tuesday: 'rest',
+    wednesday: 'day_2',
     thursday: 'rest',
-    friday: 'day_4',
-    saturday: 'rest',
-    sunday: 'rest',
+    friday: 'rest',
+    saturday: 'day_3',
+    sunday: 'day_4',
   },
   phases: [
     {

@@ -41,6 +41,16 @@ export const BUFF_DUDES: Program = {
   id: "buff_dudes",
   name: "Buff Dudes Program",
   edition: "3rd Edition",
+  daysPerWeek: 4,
+  schedule: {
+    monday: "day_1",
+    tuesday: "rest",
+    wednesday: "day_2",
+    thursday: "rest",
+    friday: "rest",
+    saturday: "day_3",
+    sunday: "day_4",
+  },
   phases: [
     {
       id: "phase_1",

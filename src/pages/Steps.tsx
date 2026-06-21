@@ -9,6 +9,8 @@ import { useTheme } from '../contexts/ThemeContext'
 import ScrollReveal from '../components/ScrollReveal'
 
 const GOAL = 10_000
+// Rough energy estimate from steps: ~0.04 kcal per step for an average adult.
+const KCAL_PER_STEP = 0.04
 
 // Concrete colours for recharts (SVG attributes don't resolve CSS vars reliably).
 const CHART = {
@@ -51,12 +53,16 @@ export default function Steps() {
   const todaySteps = entryMap.get(today) ?? 0
   const goalPct = Math.min(100, (todaySteps / GOAL) * 100)
   const goalMet = todaySteps >= GOAL
+  const todayKcal = Math.round(todaySteps * KCAL_PER_STEP)
 
   const weeklyAvg = useMemo(() => {
     if (entries.length === 0) return 0
     const last7 = entries.slice(0, 7)
     return Math.round(last7.reduce((s, e) => s + e.steps, 0) / last7.length)
   }, [entries])
+
+  // Average calories per day, aligned with the (7-day) average step count.
+  const avgKcal = Math.round(weeklyAvg * KCAL_PER_STEP)
 
   const bestDay = useMemo(() => {
     if (entries.length === 0) return 0
@@ -136,6 +142,9 @@ export default function Steps() {
               >
                 {todaySteps.toLocaleString()}
               </p>
+              <p className="text-[12px] font-light text-ink-muted mt-1.5 tabular-nums">
+                ≈ {todayKcal.toLocaleString()} kcal burned
+              </p>
             </div>
             <div className="text-right mb-1">
               <p className="text-[11px] font-light text-ink-muted">goal</p>
@@ -160,18 +169,24 @@ export default function Steps() {
 
       {/* Stat cards */}
       <ScrollReveal delay={60}>
-      <div className="px-6 mb-5 grid grid-cols-2 gap-3 apex-stagger">
+      <div className="px-6 mb-5 grid grid-cols-3 gap-3 apex-stagger">
         <div className="bg-surface border-[0.5px] border-border px-4 py-4">
-          <p className="text-[28px] font-extralight text-ink leading-none tabular-nums">
+          <p className="text-[24px] font-extralight text-ink leading-none tabular-nums">
             {weeklyAvg.toLocaleString()}
           </p>
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mt-1">7-day avg</p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-ink-muted mt-1">7-day avg</p>
         </div>
         <div className="bg-surface border-[0.5px] border-border px-4 py-4">
-          <p className="text-[28px] font-extralight text-ink leading-none tabular-nums">
+          <p className="text-[24px] font-extralight text-ink leading-none tabular-nums">
             {bestDay.toLocaleString()}
           </p>
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-muted mt-1">best day</p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-ink-muted mt-1">best day</p>
+        </div>
+        <div className="bg-surface border-[0.5px] border-border px-4 py-4">
+          <p className="text-[24px] font-extralight text-ink leading-none tabular-nums">
+            {avgKcal.toLocaleString()}
+          </p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-ink-muted mt-1">kcal / day</p>
         </div>
       </div>
       </ScrollReveal>

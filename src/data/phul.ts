@@ -8,12 +8,12 @@ export const PHUL: Program = {
   daysPerWeek: 4,
   schedule: {
     monday: 'day_1',
-    tuesday: 'day_2',
-    wednesday: 'rest',
-    thursday: 'day_3',
-    friday: 'day_4',
-    saturday: 'rest',
-    sunday: 'rest',
+    tuesday: 'rest',
+    wednesday: 'day_2',
+    thursday: 'rest',
+    friday: 'rest',
+    saturday: 'day_3',
+    sunday: 'day_4',
   },
   phases: [
     {
