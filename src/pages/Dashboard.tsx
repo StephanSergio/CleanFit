@@ -242,10 +242,6 @@ export default function Dashboard() {
           Progress
         </button>
         <span className="text-border">·</span>
-        <button onClick={() => navigate('/meals')} className="text-[11px] font-medium uppercase tracking-[0.18em] text-ink-muted active:text-ink-mid">
-          Meals
-        </button>
-        <span className="text-border">·</span>
         <button onClick={startFreeSession} className="text-[11px] font-medium uppercase tracking-[0.18em] text-ink-muted active:text-ink-mid">
           Free Session
         </button>

@@ -18,7 +18,6 @@ import Profile from './pages/Profile'
 import Program from './pages/Program'
 import PhaseDetail from './pages/PhaseDetail'
 import DayWorkout from './pages/DayWorkout'
-import Meals from './pages/Meals'
 
 function ProtectedLayout() {
   const { user, loading } = useAuth()
@@ -44,7 +43,6 @@ function ProtectedLayout() {
         <Route path="/exercises" element={<Exercises />} />
         <Route path="/history" element={<History />} />
         <Route path="/progress" element={<Progress />} />
-        <Route path="/meals" element={<Meals />} />
         <Route path="/programs" element={<Programs />} />
         <Route path="/steps" element={<Steps />} />
         <Route path="/profile" element={<Profile />} />
@@ -93,7 +91,7 @@ function ScrollGradient() {
 
 // Top-level routes that act as peer "tabs" — moving between these crossfades;
 // going deeper (into /program/...) slides forward, and back slides in reverse.
-const TAB_PATHS = ['/', '/programs', '/workout', '/steps', '/meals', '/profile', '/history', '/progress']
+const TAB_PATHS = ['/', '/programs', '/workout', '/steps', '/profile', '/history', '/progress']
 
 // Sets data-transition on <html> just before each route's view transition runs,
 // so the CSS in index.css can pick the right direction. Runs inside React Router's
