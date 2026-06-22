@@ -11,7 +11,6 @@ import { useExerciseImages } from '../hooks/useExerciseImages'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { usePresets, applyPresetWeights } from '../contexts/PresetsContext'
 import RestTimer from '../components/RestTimer'
-import ScrollReveal from '../components/ScrollReveal'
 import ExerciseDrawer from '../components/ExerciseDrawer'
 import PageGlow from '../components/PageGlow'
 import { useStopwatch } from '../hooks/useStopwatch'
@@ -76,7 +75,9 @@ export default function DayWorkout() {
   const timerKey = `timer_v1|${programId}|${phaseId}|${week}|${dayNum}`
 
   const [startTime] = useState(() => loadStored(storeKey)?.startTime ?? Date.now())
-  const [tracking, setTracking] = useState(false)
+  // Always open a program day straight into tracking (resuming saved progress
+  // if any) — no separate preview page, so every day behaves the same.
+  const [tracking, setTracking] = useState(true)
   const [exercises, setExercises] = useState<TrackingExercise[]>([])
   const [saving, setSaving] = useState(false)
   const [restActive, setRestActive] = useState(false)
@@ -307,59 +308,6 @@ export default function DayWorkout() {
     else navigate(`/program/${program!.id}`)
   }
 
-  // ── Pre-workout overview ──────────────────────────────────────
-  if (!tracking) {
-    return (
-      <>
-      <PageGlow />
-      <div className="min-h-screen pb-32 apex-page">
-        <div className="px-6 pt-14 pb-5 border-b-[0.5px] border-border">
-          <button onClick={() => navigate(`/program/${program.id}/${phaseId}`)}
-            className="flex items-center gap-2 text-ink-muted text-[11px] uppercase tracking-[0.14em] mb-6">
-            <ArrowLeft size={14} /> {program.name.toLowerCase()}
-          </button>
-          <p className="t-eyebrow mb-3 head-rise" style={{ animationDelay: '40ms' }}>
-            {program.phases.length > 1 ? `Phase ${phaseIndex} · ` : ''}Week {week} · Day {day.day}
-            {day.type && (
-              <span className="ml-2 border-[0.5px] border-accent text-accent px-2 py-0.5 rounded-[6px]">{day.type}</span>
-            )}
-          </p>
-          <h1 className="t-hero ink-tint head-rise" style={{ animationDelay: '90ms' }}>{day.focus.toLowerCase()}</h1>
-          <p className="text-[13px] font-light text-ink-muted mt-3 head-rise" style={{ animationDelay: '150ms' }}>{day.exercises.length} exercises</p>
-        </div>
-
-        <div className="px-6 pt-4">
-          {day.note && <p className="text-[13px] font-light text-ink-mid leading-relaxed mb-6 tracking-[0.01em]">{day.note}</p>}
-          {day.exercises.map((ex, i) => (
-            <ScrollReveal key={i} delay={i * 35} as="div">
-              <button
-                onClick={() => setTracking(true)}
-                className={`w-full text-left flex items-start py-4 border-b-[0.5px] border-border last:border-b-0 active:bg-accent-bg transition-colors ${ex.superset ? 'pl-4 border-l-[0.5px] border-l-accent' : ''}`}
-              >
-                <span className="text-[11px] font-light text-ink-muted w-6 flex-shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
-                <div className="flex-1 min-w-0 px-4">
-                  <p className="text-[15px] font-light text-ink tracking-[0.01em] lowercase leading-snug">{ex.name.toLowerCase()}</p>
-                  <p className="text-[11px] font-light text-ink-mid mt-0.5 tracking-[0.03em]">
-                    {ex.sets} sets · {ex.reps} reps{ex.homeAlt ? ` · alt: ${ex.homeAlt.toLowerCase()}` : ''}
-                  </p>
-                </div>
-                <ArrowLeft size={12} className="text-ink-muted flex-shrink-0 mt-1 rotate-180" />
-              </button>
-            </ScrollReveal>
-          ))}
-        </div>
-
-        <div className="fixed bottom-0 left-0 right-0 px-6 pt-8 pb-6 bg-bg"
-          style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
-          <button onClick={() => setTracking(true)}
-            className="w-full bg-accent text-white py-[18px] t-cta active:opacity-80 active:scale-[0.97] transition-all duration-100">
-            Start Workout
-          </button>
-        </div>
-      </div>
-      </>
-    )
-  }
 
   // ── Active tracking ───────────────────────────────────────────
   return (
