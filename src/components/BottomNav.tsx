@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { House, Layers, Dumbbell, Footprints, Salad } from 'lucide-react'
+import { House, Layers, Dumbbell, Footprints } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 
 const tabs = [
@@ -7,7 +7,6 @@ const tabs = [
   { to: '/programs', icon: Layers, label: 'Programs' },
   { to: '/workout', icon: Dumbbell, label: 'Workout', end: true },
   { to: '/steps', icon: Footprints, label: 'Steps' },
-  { to: '/meals', icon: Salad, label: 'Meals' },
 ]
 
 export default function BottomNav() {
