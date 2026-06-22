@@ -31,14 +31,18 @@ export function PresetsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user) { setPresets({}); return }
-    const unsub = onSnapshot(collection(db, 'users', user.uid, 'exercisePresets'), (snap) => {
-      const map: Record<string, ExercisePreset> = {}
-      snap.docs.forEach((d) => {
-        const data = d.data()
-        map[d.id] = { weights: data.weights ?? [], reps: data.reps ?? [] }
-      })
-      setPresets(map)
-    })
+    const unsub = onSnapshot(
+      collection(db, 'users', user.uid, 'exercisePresets'),
+      (snap) => {
+        const map: Record<string, ExercisePreset> = {}
+        snap.docs.forEach((d) => {
+          const data = d.data()
+          map[d.id] = { weights: data.weights ?? [], reps: data.reps ?? [] }
+        })
+        setPresets(map)
+      },
+      (err) => console.error('presets onSnapshot failed', err)
+    )
     return unsub
   }, [user])
 
@@ -54,7 +58,7 @@ export function PresetsProvider({ children }: { children: ReactNode }) {
     setPresets((prev) => ({ ...prev, [key]: { weights, reps } }))
     setDoc(doc(db, 'users', user.uid, 'exercisePresets', key), {
       name, weights, reps, updatedAt: Date.now(),
-    }).catch(() => {})
+    }).catch((e) => console.error('savePreset failed', e))
   }, [user])
 
   return (
