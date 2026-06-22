@@ -38,7 +38,7 @@ export default function Dashboard() {
   const activeProgram = getProgram(progress?.programId) ?? PROGRAMS[0]
   const done = completedFor(activeProgram.id)
   const total = totalSessions(activeProgram.id)
-  const pct = total ? Math.round((done / total) * 100) : null
+  const pct = total ? Math.min(100, Math.round((done / total) * 100)) : null
   const left = total != null ? Math.max(0, total - done) : null
 
   const phase = progress?.programId === activeProgram.id

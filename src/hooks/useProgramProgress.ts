@@ -132,20 +132,22 @@ export function getNextSession(programId: string, phaseId: string, week: number,
     return { programId, phaseId, week, dayNum: phase.days[dayIdx + 1].day }
   }
 
+  // Ongoing cycle (no fixed weeks): just roll to the next week in place.
   if (phase.weeks === null) {
     return { programId, phaseId, week: week + 1, dayNum: phase.days[0].day }
   }
 
-  const weekIdx = phase.weeks.indexOf(week)
-  if (weekIdx >= 0 && weekIdx < phase.weeks.length - 1) {
-    return { programId, phaseId, week: phase.weeks[weekIdx + 1], dayNum: phase.days[0].day }
-  }
-
-  const phaseIdx = program.phases.findIndex((p) => p.id === phaseId)
-  const nextPhase = program.phases[phaseIdx + 1]
+  // Otherwise advance by ABSOLUTE week number: jump to whichever phase owns
+  // week N+1. This makes alternating programs (e.g. Build Muscle: Plan A on
+  // odd weeks, Plan B on even) flow chronologically 1 → 2 → 3 → … without the
+  // user thinking about phases, and still works for sequential phases.
+  // Optional ongoing/bonus phases (weeks === null) are not auto-entered.
+  const targetWeek = week + 1
+  const nextPhase = program.phases.find(
+    (p) => Array.isArray(p.weeks) && p.weeks.includes(targetWeek)
+  )
   if (nextPhase) {
-    const w = nextPhase.weeks ? nextPhase.weeks[0] : 1
-    return { programId, phaseId: nextPhase.id, week: w, dayNum: nextPhase.days[0].day }
+    return { programId, phaseId: nextPhase.id, week: targetWeek, dayNum: nextPhase.days[0].day }
   }
 
   return null
@@ -155,9 +157,13 @@ export function totalSessions(programId: string): number | null {
   const program = getProgram(programId)
   if (!program) return 0
   let total = 0
+  let counted = false
   for (const p of program.phases) {
-    if (p.weeks === null) return null
+    // Skip optional ongoing/bonus phases — they're not part of the planned count.
+    if (p.weeks === null) continue
     total += p.weeks.length * p.days.length
+    counted = true
   }
-  return total
+  // If every phase is an ongoing cycle (e.g. PHUL), there's no fixed total.
+  return counted ? total : null
 }
