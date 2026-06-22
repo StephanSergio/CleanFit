@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, lazy, Suspense } from 'react'
 import { HashRouter, Routes, Route, Navigate, useLocation, useNavigationType } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
 import { WorkoutProvider } from './contexts/WorkoutContext'
@@ -8,17 +8,29 @@ import { PresetsProvider } from './contexts/PresetsContext'
 import { ToastProvider } from './contexts/ToastContext'
 import BottomNav from './components/BottomNav'
 import Auth from './pages/Auth'
-import Dashboard from './pages/Dashboard'
-import Workout from './pages/Workout'
-import Exercises from './pages/Exercises'
-import History from './pages/History'
-import Progress from './pages/Progress'
-import Programs from './pages/Programs'
-import Steps from './pages/Steps'
-import Profile from './pages/Profile'
-import Program from './pages/Program'
-import PhaseDetail from './pages/PhaseDetail'
-import DayWorkout from './pages/DayWorkout'
+
+// Pages are code-split: each becomes its own chunk loaded on navigation, so the
+// initial bundle stays small (heavy deps like recharts ride along only with the
+// chart pages, not the first paint).
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Workout = lazy(() => import('./pages/Workout'))
+const Exercises = lazy(() => import('./pages/Exercises'))
+const History = lazy(() => import('./pages/History'))
+const Progress = lazy(() => import('./pages/Progress'))
+const Programs = lazy(() => import('./pages/Programs'))
+const Steps = lazy(() => import('./pages/Steps'))
+const Profile = lazy(() => import('./pages/Profile'))
+const Program = lazy(() => import('./pages/Program'))
+const PhaseDetail = lazy(() => import('./pages/PhaseDetail'))
+const DayWorkout = lazy(() => import('./pages/DayWorkout'))
+
+function PageFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+}
 
 function ProtectedLayout() {
   const { user, loading } = useAuth()
@@ -38,19 +50,21 @@ function ProtectedLayout() {
     <WorkoutProvider>
     <StepsProvider>
     <PresetsProvider>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/workout" element={<Workout />} />
-        <Route path="/exercises" element={<Exercises />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/progress" element={<Progress />} />
-        <Route path="/programs" element={<Programs />} />
-        <Route path="/steps" element={<Steps />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/program/:programId" element={<Program />} />
-        <Route path="/program/:programId/:phaseId" element={<PhaseDetail />} />
-        <Route path="/program/:programId/:phaseId/w/:week/d/:dayNum" element={<DayWorkout />} />
-      </Routes>
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/workout" element={<Workout />} />
+          <Route path="/exercises" element={<Exercises />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/progress" element={<Progress />} />
+          <Route path="/programs" element={<Programs />} />
+          <Route path="/steps" element={<Steps />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/program/:programId" element={<Program />} />
+          <Route path="/program/:programId/:phaseId" element={<PhaseDetail />} />
+          <Route path="/program/:programId/:phaseId/w/:week/d/:dayNum" element={<DayWorkout />} />
+        </Routes>
+      </Suspense>
       <BottomNav />
     </PresetsProvider>
     </StepsProvider>
