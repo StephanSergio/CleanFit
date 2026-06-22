@@ -27,6 +27,7 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
         <div className="flex items-center gap-1.5 w-full justify-center">
           <button
             type="button"
+            aria-label="Decrease reps"
             onClick={() => onChange({ reps: Math.max(1, set.reps - 1) })}
             className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid flex-shrink-0"
           >
@@ -45,6 +46,7 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
           </div>
           <button
             type="button"
+            aria-label="Increase reps"
             onClick={() => onChange({ reps: set.reps + 1 })}
             className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid flex-shrink-0"
           >
@@ -60,6 +62,7 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
         <div className="flex items-center gap-1.5 w-full justify-center">
           <button
             type="button"
+            aria-label="Decrease weight"
             onClick={() => onChange({ weightKg: Math.max(0, set.weightKg - 2.5) })}
             className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid flex-shrink-0"
           >
@@ -78,6 +81,7 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
           </div>
           <button
             type="button"
+            aria-label="Increase weight"
             onClick={() => onChange({ weightKg: set.weightKg + 2.5 })}
             className="w-7 h-7 bg-[#1C1C1A] border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid flex-shrink-0"
           >
@@ -88,6 +92,7 @@ export default function SetRow({ setNumber, set, onChange, onToggle }: Props) {
 
       <button
         onClick={onToggle}
+        aria-label={set.completed ? 'Mark set incomplete' : 'Mark set complete'}
         className={`w-7 h-7 border-[0.5px] flex items-center justify-center flex-shrink-0 active:scale-110 transition-all duration-150 ${
           set.completed
             ? 'border-accent bg-accent text-white'

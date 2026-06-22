@@ -1,13 +1,17 @@
 import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
 
 // Vitest reads this file (not vite.config.ts), so the production build's
 // `tsc -b` — which only checks vite.config.ts — is never coupled to test setup.
+// Use the automatic JSX runtime so .tsx tests don't need React in scope.
 export default defineConfig({
-  plugins: [react()],
+  esbuild: { jsx: 'automatic' },
   test: {
-    // Pure-logic unit tests run in Node; no DOM needed.
+    // Default to Node for pure-logic tests; component tests opt into jsdom with
+    // a `// @vitest-environment jsdom` docblock at the top of the file.
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}'],
+    setupFiles: ['./src/test/setup.ts'],
+    // Globals make Testing Library auto-cleanup the DOM after each test.
+    globals: true,
   },
 })
