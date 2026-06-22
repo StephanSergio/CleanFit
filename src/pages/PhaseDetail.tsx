@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useVTNavigate } from '../hooks/useVTNavigate'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
-import { getProgram } from '../data/programs'
+import { getProgram, formatWeeks } from '../data/programs'
 import { useCompletedSessions } from '../hooks/useProgramProgress'
 import ScrollReveal from '../components/ScrollReveal'
 import PageGlow from '../components/PageGlow'
@@ -100,7 +100,7 @@ export default function PhaseDetail() {
         <p className="text-[13px] font-light text-ink-mid mt-1">
           {ongoing
             ? `${phase.days.length} days/week · repeats indefinitely`
-            : `Weeks ${(phase.weeks as number[])[0]}–${(phase.weeks as number[])[(phase.weeks as number[]).length - 1]} · ${phase.days.length} days/week`}
+            : `${formatWeeks(phase.weeks as number[])} · ${phase.days.length} days/week`}
         </p>
       </div>
 

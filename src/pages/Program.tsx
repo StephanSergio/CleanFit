@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useVTNavigate } from '../hooks/useVTNavigate'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { getProgram } from '../data/programs'
+import { getProgram, formatWeeks } from '../data/programs'
 
 export default function Program() {
   const { programId } = useParams()
@@ -62,7 +62,7 @@ export default function Program() {
               </p>
               <p className="text-[13px] font-light text-ink-mid mt-0.5">
                 {phase.weeks
-                  ? `Weeks ${phase.weeks[0]}–${phase.weeks[phase.weeks.length - 1]} · ${phase.days.length} days`
+                  ? `${formatWeeks(phase.weeks)} · ${phase.days.length} days`
                   : `${phase.days.length} days · repeats weekly`}
               </p>
             </div>
