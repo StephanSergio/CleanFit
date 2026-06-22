@@ -6,6 +6,7 @@ import { useWorkout } from '../contexts/WorkoutContext'
 import { useProgramProgress, useCompletedSessions, totalSessions, getNextSession } from '../hooks/useProgramProgress'
 import { PROGRAMS, getProgram } from '../data/programs'
 import ScrollReveal from '../components/ScrollReveal'
+import { ymd } from '../lib/dates'
 
 // The whole week, Monday → Sunday. `idx` is JS getDay() (0=Sun…6=Sat) so it
 // lines up with "today" and with the date math below. Weekends are first-class
@@ -20,10 +21,6 @@ const WEEK_ORDER: { key: string; idx: number; label: string }[] = [
   { key: 'sunday', idx: 0, label: 'SUN' },
 ]
 
-// YYYY-MM-DD for a date (matches how workouts store their `date`).
-function ymd(d: Date) {
-  return d.toISOString().split('T')[0]
-}
 
 export default function Dashboard() {
   const { user } = useAuth()

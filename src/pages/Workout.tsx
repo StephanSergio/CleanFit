@@ -9,6 +9,7 @@ import ExerciseCard from '../components/ExerciseCard'
 import SetRow from '../components/SetRow'
 import ExerciseDrawer from '../components/ExerciseDrawer'
 import RestTimer from '../components/RestTimer'
+import { ymd } from '../lib/dates'
 import type { WgerExercise } from '../types'
 
 export default function Workout() {
@@ -58,7 +59,7 @@ export default function Workout() {
     workout.exercises.forEach((ex) => savePreset(ex.name, ex.sets.map((s) => s.weightKg), ex.sets.map((s) => s.reps)))
     await saveWorkout({
       name: workout.name,
-      date: new Date().toISOString().split('T')[0],
+      date: ymd(),
       durationMinutes: Math.round((Date.now() - workout.startTime) / 60000),
       exercises: workout.exercises,
     })

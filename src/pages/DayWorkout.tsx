@@ -15,6 +15,7 @@ import ExerciseDrawer from '../components/ExerciseDrawer'
 import PageGlow from '../components/PageGlow'
 import { useStopwatch } from '../hooks/useStopwatch'
 import NumField from '../components/NumField'
+import { ymd } from '../lib/dates'
 import type { WorkoutSet, WgerExercise } from '../types'
 
 function parseReps(setsCount: number, repsStr: string): WorkoutSet[] {
@@ -278,7 +279,7 @@ export default function DayWorkout() {
     exs.forEach((ex) => savePreset(ex.name, ex.sets.map((s) => s.weightKg), ex.sets.map((s) => s.reps)))
     const payload = {
       name: `${program!.name} · W${week} D${day!.day} — ${day!.focus}`,
-      date: new Date().toISOString().split('T')[0],
+      date: ymd(),
       durationMinutes: Math.max(0, Math.round(elapsedMs / 60000)),
       exercises: exs.map((ex) => ({
         exerciseId: `${programId}-w${week}-d${day!.day}-${ex.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,

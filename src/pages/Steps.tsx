@@ -7,6 +7,7 @@ import {
 import { useSteps } from '../contexts/StepsContext'
 import { useTheme } from '../contexts/ThemeContext'
 import ScrollReveal from '../components/ScrollReveal'
+import { ymd, todayStr } from '../lib/dates'
 
 const GOAL = 10_000
 // Rough energy estimate from steps: ~0.04 kcal per step for an average adult.
@@ -16,17 +17,6 @@ const KCAL_PER_STEP = 0.04
 const CHART = {
   light: { accent: '#4f46e5', ink: '#1a1a1a', grid: '#e3e0d9', axis: '#B5B2AA', surface: '#faf9f6', track: '#e3e0d9', cursor: '#f5f3ef' },
   dark:  { accent: '#6366f1', ink: '#f3f1ec', grid: '#2a2a26', axis: '#6f6c63', surface: '#1b1b18', track: '#2a2a26', cursor: '#1b1b18' },
-}
-
-// Local calendar date (YYYY-MM-DD) — uses the device's date, not UTC, so
-// "today" matches the date picker and the user's calendar in every timezone.
-function ymd(d: Date) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
-    d.getDate()
-  ).padStart(2, '0')}`
-}
-function todayStr() {
-  return ymd(new Date())
 }
 
 function fmtDate(dateStr: string) {

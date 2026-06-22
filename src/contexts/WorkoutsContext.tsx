@@ -6,6 +6,7 @@ import {
 import { db } from '../lib/firebase'
 import type { Workout } from '../types'
 import { useAuth } from '../hooks/useAuth'
+import { useToast } from './ToastContext'
 
 interface WorkoutsCtx {
   workouts: Workout[]
@@ -19,6 +20,7 @@ const Ctx = createContext<WorkoutsCtx | null>(null)
 
 export function WorkoutsProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
+  const { showToast } = useToast()
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -60,17 +62,28 @@ export function WorkoutsProvider({ children }: { children: ReactNode }) {
 
   async function saveWorkout(workout: Omit<Workout, 'id'>) {
     if (!ref || !user) return null
-    const docRef = await addDoc(ref, { ...workout, createdAt: serverTimestamp() })
-    // Optimistically prepend so consumers see the new workout immediately.
-    setWorkouts((prev) => [{ ...workout, id: docRef.id } as Workout, ...prev])
-    return docRef.id
+    try {
+      const docRef = await addDoc(ref, { ...workout, createdAt: serverTimestamp() })
+      // Optimistically prepend so consumers see the new workout immediately.
+      setWorkouts((prev) => [{ ...workout, id: docRef.id } as Workout, ...prev])
+      return docRef.id
+    } catch (e) {
+      console.error('saveWorkout failed', e)
+      showToast("Couldn't save your workout — check your connection.", 'error')
+      return null
+    }
   }
 
   async function updateWorkout(id: string, workout: Omit<Workout, 'id'>) {
     if (!user) return
-    await updateDoc(doc(db, 'users', user.uid, 'workouts', id), { ...workout })
-    // Update in-place so consumers reflect the change without a re-fetch.
-    setWorkouts((prev) => prev.map((w) => (w.id === id ? { ...w, ...workout } : w)))
+    try {
+      await updateDoc(doc(db, 'users', user.uid, 'workouts', id), { ...workout })
+      // Update in-place so consumers reflect the change without a re-fetch.
+      setWorkouts((prev) => prev.map((w) => (w.id === id ? { ...w, ...workout } : w)))
+    } catch (e) {
+      console.error('updateWorkout failed', e)
+      showToast("Couldn't save your changes — check your connection.", 'error')
+    }
   }
 
   return (

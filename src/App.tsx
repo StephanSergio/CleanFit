@@ -5,6 +5,7 @@ import { WorkoutProvider } from './contexts/WorkoutContext'
 import { WorkoutsProvider } from './contexts/WorkoutsContext'
 import { StepsProvider } from './contexts/StepsContext'
 import { PresetsProvider } from './contexts/PresetsContext'
+import { ToastProvider } from './contexts/ToastContext'
 import BottomNav from './components/BottomNav'
 import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
@@ -124,14 +125,16 @@ function PageTransitions() {
 
 export default function App() {
   return (
-    <HashRouter>
-      <ScrollGradient />
-      <PageTransitions />
-      <Routes>
-        <Route path="/auth" element={<AuthGuard />} />
-        <Route path="/*" element={<ProtectedLayout />} />
-      </Routes>
-    </HashRouter>
+    <ToastProvider>
+      <HashRouter>
+        <ScrollGradient />
+        <PageTransitions />
+        <Routes>
+          <Route path="/auth" element={<AuthGuard />} />
+          <Route path="/*" element={<ProtectedLayout />} />
+        </Routes>
+      </HashRouter>
+    </ToastProvider>
   )
 }
 
