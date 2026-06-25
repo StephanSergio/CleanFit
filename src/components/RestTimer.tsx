@@ -14,35 +14,64 @@ interface Props {
 
 export default function RestTimer({ onDismiss }: Props) {
   const [preset, setPreset] = useState(90)
-  const [remaining, setRemaining] = useState(90)
+  // Wall-clock based: we track the absolute end time and derive the remaining
+  // seconds from Date.now(). Counting real elapsed time (not interval ticks)
+  // means the rest keeps running while the tab is backgrounded, the phone is
+  // locked, or you switch to another app — when you come back it reflects the
+  // true time left (or it's already done).
+  const [endAt, setEndAt] = useState(() => Date.now() + 90_000)
   const [paused, setPaused] = useState(false)
+  const [pausedRemaining, setPausedRemaining] = useState(90)
+  const [, setNow] = useState(Date.now()) // re-render tick only
   const onDismissRef = useRef(onDismiss)
   onDismissRef.current = onDismiss
 
+  const remaining = paused
+    ? pausedRemaining
+    : Math.max(0, Math.ceil((endAt - Date.now()) / 1000))
+
+  // Refresh the display, and re-sync the instant the tab becomes visible again
+  // (so returning from the background snaps to the correct time immediately).
   useEffect(() => {
     if (paused) return
-    const id = setInterval(() => {
-      setRemaining((r) => {
-        if (r <= 1) {
-          clearInterval(id)
-          onDismissRef.current()
-          return 0
-        }
-        return r - 1
-      })
-    }, 1000)
-    return () => clearInterval(id)
+    const tick = () => setNow(Date.now())
+    const id = setInterval(tick, 500)
+    const onVisible = () => { if (!document.hidden) tick() }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      clearInterval(id)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
   }, [paused])
+
+  // Auto-dismiss when the rest has elapsed (incl. while it was backgrounded).
+  useEffect(() => {
+    if (!paused && remaining <= 0) onDismissRef.current()
+  }, [remaining, paused])
 
   function select(seconds: number) {
     setPreset(seconds)
-    setRemaining(seconds)
+    setEndAt(Date.now() + seconds * 1000)
     setPaused(false)
+    setNow(Date.now())
   }
 
   function reset() {
-    setRemaining(preset)
+    setEndAt(Date.now() + preset * 1000)
     setPaused(false)
+    setNow(Date.now())
+  }
+
+  function togglePause() {
+    if (paused) {
+      // Resume: rebuild the end time from the remaining seconds.
+      setEndAt(Date.now() + pausedRemaining * 1000)
+      setPaused(false)
+      setNow(Date.now())
+    } else {
+      setPausedRemaining(Math.max(0, Math.ceil((endAt - Date.now()) / 1000)))
+      setPaused(true)
+    }
   }
 
   const pct = Math.max(0, (remaining / preset) * 100)
@@ -55,7 +84,7 @@ export default function RestTimer({ onDismiss }: Props) {
         <div className="h-[1px] bg-[#2A2A28]">
           <div
             className="h-[1px] bg-accent transition-all ease-linear"
-            style={{ width: `${pct}%`, transitionDuration: '1s' }}
+            style={{ width: `${pct}%`, transitionDuration: '0.5s' }}
           />
         </div>
 
@@ -85,19 +114,22 @@ export default function RestTimer({ onDismiss }: Props) {
 
           <div className="flex gap-1.5 flex-shrink-0">
             <button
-              onClick={() => setPaused((p) => !p)}
+              onClick={togglePause}
+              aria-label={paused ? 'Resume rest' : 'Pause rest'}
               className="w-9 h-9 rounded-none bg-transparent border-[0.5px] border-[#2A2A28] flex items-center justify-center text-accent"
             >
               {paused ? <Play size={15} /> : <Pause size={15} />}
             </button>
             <button
               onClick={reset}
+              aria-label="Reset rest"
               className="w-9 h-9 rounded-none bg-transparent border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid"
             >
               <RotateCcw size={15} />
             </button>
             <button
               onClick={onDismiss}
+              aria-label="Dismiss rest timer"
               className="w-9 h-9 rounded-none bg-transparent border-[0.5px] border-[#2A2A28] flex items-center justify-center text-ink-mid"
             >
               <X size={15} />
