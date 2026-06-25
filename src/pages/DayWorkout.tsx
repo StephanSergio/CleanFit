@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useVTNavigate } from '../hooks/useVTNavigate'
-import { ArrowLeft, Timer, CheckCircle2, Clock, Repeat2, Pause, Play, RotateCcw, Plus, X } from 'lucide-react'
+import { ArrowLeft, Timer, CheckCircle2, Clock, Repeat2, Pause, Play, RotateCcw, Plus, X, SkipForward } from 'lucide-react'
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useAuth } from '../hooks/useAuth'
 import { getProgram } from '../data/programs'
-import { useProgramProgress, useCompletedSessions, getNextSession } from '../hooks/useProgramProgress'
+import { useProgramProgress, useCompletedSessions, useSkippedSessions, getNextSession, orderedSessions, nextPending, sessionKey } from '../hooks/useProgramProgress'
 import { useExerciseImages } from '../hooks/useExerciseImages'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { usePresets, applyPresetWeights } from '../contexts/PresetsContext'
@@ -55,7 +55,8 @@ export default function DayWorkout() {
   const week = Number(weekParam)
   const navigate = useVTNavigate()
   const { saveSession } = useProgramProgress()
-  const { markComplete } = useCompletedSessions()
+  const { markComplete, isComplete } = useCompletedSessions()
+  const { markSkipped, skipCount } = useSkippedSessions()
   const { getImage } = useExerciseImages()
   const { saveWorkout, updateWorkout } = useWorkouts()
   const { getPreset, savePreset } = usePresets()
@@ -186,7 +187,19 @@ export default function DayWorkout() {
   const totalSets = exercises.reduce((n, ex) => n + ex.sets.length, 0)
   const completedSets = exercises.reduce((n, ex) => n + ex.sets.filter((s) => s.completed).length, 0)
   const allDone = totalSets > 0 && completedSets === totalSets
-  const nextDay = getNextSession(program.id, phaseId!, week, day.day)
+
+  // Where finishing/skipping this day should go next. For fixed-week programs we
+  // use the catch-up logic (earliest day not done and not skipped twice, ignoring
+  // this one); ongoing programs (PHUL) fall back to the plain next week.
+  const currentKey = sessionKey(program.id, phaseId!, week, day.day)
+  const nextDay = orderedSessions(program.id).length
+    ? nextPending(
+        program.id,
+        (p, w, d) => isComplete(program.id, p, w, d),
+        (p, w, d) => skipCount(program.id, p, w, d),
+        currentKey
+      )
+    : getNextSession(program.id, phaseId!, week, day.day)
 
   function updateSet(exIdx: number, setIdx: number, patch: Partial<WorkoutSet>) {
     setExercises((prev) => prev.map((ex, i) => i !== exIdx ? ex : {
@@ -309,6 +322,15 @@ export default function DayWorkout() {
     else navigate(`/program/${program!.id}`)
   }
 
+  // Skip this day for now. We flush the in-progress log so nothing is lost (the
+  // draft is kept, not cleared), bump the skip count, and move on. A once-skipped
+  // day returns as "next" later; a twice-skipped one is bypassed for good.
+  function skipAndNext() {
+    saveStored(storeKey, { exercises, docId: docIdRef.current, startTime })
+    markSkipped(program!.id, phase!.id, week, day!.day)
+    if (nextDay) navigate(`/program/${nextDay.programId}/${nextDay.phaseId}/w/${nextDay.week}/d/${nextDay.dayNum}`)
+    else navigate(`/program/${program!.id}`)
+  }
 
   // ── Active tracking ───────────────────────────────────────────
   return (
@@ -324,10 +346,17 @@ export default function DayWorkout() {
       )}
 
       <div className="px-6 pt-14 pb-4 border-b-[0.5px] border-border">
-        <button onClick={() => navigate(`/program/${program.id}/${phaseId}`)}
-          className="flex items-center gap-2 text-ink-mid text-[11px] uppercase tracking-[0.14em] mb-5">
-          <ArrowLeft size={14} /> {program.name.toLowerCase()}
-        </button>
+        <div className="flex items-center justify-between gap-3 mb-5">
+          <button onClick={() => navigate(`/program/${program.id}/${phaseId}`)}
+            className="flex items-center gap-2 text-ink-mid text-[11px] uppercase tracking-[0.14em]">
+            <ArrowLeft size={14} /> {program.name.toLowerCase()}
+          </button>
+          <button onClick={skipAndNext}
+            className="flex items-center gap-1.5 text-ink-muted text-[11px] uppercase tracking-[0.14em] active:text-accent active:scale-95 transition-all duration-100"
+            aria-label="Skip this day">
+            Skip day <SkipForward size={13} />
+          </button>
+        </div>
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <p className="t-eyebrow mb-1">

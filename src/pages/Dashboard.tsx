@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useWorkouts } from '../hooks/useWorkouts'
 import { useWorkout } from '../contexts/WorkoutContext'
-import { useProgramProgress, useCompletedSessions, totalSessions, getNextSession } from '../hooks/useProgramProgress'
+import { useProgramProgress, useCompletedSessions, useSkippedSessions, totalSessions, getNextSession, orderedSessions, nextPending } from '../hooks/useProgramProgress'
 import { PROGRAMS, getProgram } from '../data/programs'
 import ScrollReveal from '../components/ScrollReveal'
 import { ymd } from '../lib/dates'
@@ -28,6 +28,7 @@ export default function Dashboard() {
   const { dispatch } = useWorkout()
   const { progress } = useProgramProgress()
   const { completedFor, isComplete } = useCompletedSessions()
+  const { skipCount } = useSkippedSessions()
   const navigate = useVTNavigate()
 
   const name = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'there'
@@ -79,6 +80,24 @@ export default function Dashboard() {
   // Where "Resume" should take you: your current in-progress day, or — if that
   // day is already finished — the next scheduled day/week/phase.
   const resume = (() => {
+    // Fixed-week programs: the next thing to do is the earliest day that isn't
+    // done and isn't skipped twice — so a skipped day comes back as "Next".
+    if (orderedSessions(activeProgram.id).length) {
+      const np = nextPending(
+        activeProgram.id,
+        (p, w, d) => isComplete(activeProgram.id, p, w, d),
+        (p, w, d) => skipCount(activeProgram.id, p, w, d)
+      )
+      if (!np) return null
+      const onIt =
+        !!progress &&
+        progress.programId === np.programId &&
+        progress.phaseId === np.phaseId &&
+        progress.week === np.week &&
+        progress.dayNum === np.dayNum
+      return { ...np, isNext: !onIt }
+    }
+    // Ongoing programs (PHUL): resume the current day, else roll to next week.
     if (!progress) return null
     const complete = isComplete(progress.programId, progress.phaseId, progress.week, progress.dayNum)
     if (!complete) return { ...progress, isNext: false }
@@ -176,6 +195,8 @@ export default function Dashboard() {
             // workout today marks today, not whatever day it was scheduled for.
             const trainedThatDay = workoutDates.has(weekDates[row.dayIndex])
             const isDone = scheduledDone || trainedThatDay
+            const skips = row.dayNum !== null && phase ? skipCount(activeProgram.id, phase.id, curWeek, row.dayNum) : 0
+            const isSkipped = !isDone && !row.isRest && skips > 0
             const isToday = row.dayIndex === todayIndex
 
             return (
@@ -205,6 +226,8 @@ export default function Dashboard() {
                 </span>
                 {isDone
                   ? <span className="text-[14px] text-accent flex-shrink-0 w-4 text-right">✓</span>
+                  : isSkipped
+                  ? <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-ink-muted flex-shrink-0">skipped</span>
                   : row.isRest
                   ? <span className="text-[11px] text-ink-muted flex-shrink-0">rest</span>
                   : <ArrowRight size={15} className={`flex-shrink-0 ${isToday ? 'text-accent' : 'text-ink-muted'}`} />}

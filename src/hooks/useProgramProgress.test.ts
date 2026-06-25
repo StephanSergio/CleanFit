@@ -5,7 +5,13 @@ import { describe, it, expect, vi } from 'vitest'
 vi.mock('../lib/firebase', () => ({ db: {} }))
 vi.mock('firebase/firestore', () => ({}))
 
-import { getNextSession, totalSessions } from './useProgramProgress'
+import {
+  getNextSession,
+  totalSessions,
+  orderedSessions,
+  nextPending,
+  sessionKey,
+} from './useProgramProgress'
 
 describe('getNextSession — within a week', () => {
   it('advances to the next day of the same week', () => {
@@ -70,5 +76,64 @@ describe('totalSessions', () => {
     const t = totalSessions('buff_dudes')
     expect(typeof t).toBe('number')
     expect(t as number).toBeGreaterThan(0)
+  })
+})
+
+describe('orderedSessions', () => {
+  it('lists Build Muscle chronologically (40 sessions, A then B by week)', () => {
+    const o = orderedSessions('build_muscle')
+    expect(o).toHaveLength(40)
+    expect(o[0]).toMatchObject({ phaseId: 'plan_a', week: 1, dayNum: 1 })
+    // After Plan A week 1's four days, week 2 belongs to Plan B.
+    expect(o[4]).toMatchObject({ phaseId: 'plan_b', week: 2, dayNum: 1 })
+  })
+
+  it('is empty for ongoing programs (PHUL)', () => {
+    expect(orderedSessions('phul')).toEqual([])
+  })
+})
+
+describe('nextPending (skip / catch-up)', () => {
+  const notDone = () => false
+  const noSkips = () => 0
+
+  it('is the first session when nothing is done or skipped', () => {
+    expect(nextPending('build_muscle', notDone, noSkips)).toMatchObject({
+      phaseId: 'plan_a', week: 1, dayNum: 1,
+    })
+  })
+
+  it('a once-skipped day still comes back as next', () => {
+    const skippedOnce = (p: string, w: number, d: number) =>
+      p === 'plan_a' && w === 1 && d === 1 ? 1 : 0
+    expect(nextPending('build_muscle', notDone, skippedOnce)).toMatchObject({
+      phaseId: 'plan_a', week: 1, dayNum: 1,
+    })
+  })
+
+  it('a twice-skipped day is bypassed for good', () => {
+    const skippedTwice = (p: string, w: number, d: number) =>
+      p === 'plan_a' && w === 1 && d === 1 ? 2 : 0
+    expect(nextPending('build_muscle', notDone, skippedTwice)).toMatchObject({
+      phaseId: 'plan_a', week: 1, dayNum: 2,
+    })
+  })
+
+  it('excludeKey skips a specific session (e.g. the one just left)', () => {
+    const key = sessionKey('build_muscle', 'plan_a', 1, 1)
+    expect(nextPending('build_muscle', notDone, noSkips, key)).toMatchObject({
+      phaseId: 'plan_a', week: 1, dayNum: 2,
+    })
+  })
+
+  it('skips completed days', () => {
+    const week1Done = (_p: string, w: number) => w === 1
+    expect(nextPending('build_muscle', week1Done, noSkips)).toMatchObject({
+      phaseId: 'plan_b', week: 2, dayNum: 1,
+    })
+  })
+
+  it('returns null for ongoing programs', () => {
+    expect(nextPending('phul', notDone, noSkips)).toBeNull()
   })
 })
